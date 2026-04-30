@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Gallery - Shantiraman ERP</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background: #f4f7f6; }
+        header { background: #2c3e50; color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-size: 1.6rem; font-weight: bold; }
+        nav a { color: white; text-decoration: none; margin-left: 20px; }
+
+        .gallery-container { padding: 40px 5%; text-align: center; }
+        
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; 
+            margin-top: 30px; 
+        }
+
+        .gallery-item { 
+            background: #87CEEB; 
+            border-radius: 12px; 
+            padding: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: 0.3s ease;
+            text-decoration: none; 
+            display: block;
+        }
+        
+        .gallery-item:hover { transform: scale(1.03); background: #00BFFF; }
+
+        .gallery-item img { 
+            width: 100%; 
+            height: 130px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            background: white;
+        }
+
+        .gallery-item p { 
+            margin: 10px 0 5px 0; 
+            font-size: 0.9rem; 
+            color: #2c3e50; 
+            font-weight: bold; 
+        }
+
+        footer { background: #2c3e50; color: white; text-align: center; padding: 20px; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-text">SHANTIRAMAN</div>
+    <nav>
+        <a href="index.html">Home</a>
+    </nav>
+</header>
+
+<section class="gallery-container">
+    <h1>Software Glimpses</h1>
+    <p>Humare ERP ke sabhi forms aur features</p>
+
+    <div class="gallery-grid">
+        <!-- Admission Form -->
+        <a href="images/Admission%20Form.png" target="_blank" class="gallery-item">
+            <img src="images/Admission%20Form.png" alt="Admission Form">
+            <p>Admission Form</p>
+        </a>
+
+        <!-- Attendence -->
+        <a href="images/Attendence.png" target="_blank" class="gallery-item">
+            <img src="images/Attendence.png" alt="Attendance">
+            <p>Attendance</p>
+        </a>
+
+        <!-- Softwere Setup -->
+        <a href="images/Softwere%20Setup.png" target="_blank" class="gallery-item">
+            <img src="images/Softwere%20Setup.png" alt="Software Setup">
+            <p>Softwere Setup</p>
+        </a>
+
+        <!-- Empoloyee Master -->
+        <a href="images/Empoloyee%20Master.png" target="_blank" class="gallery-item">
+            <img src="images/Empoloyee%20Master.png" alt="Employee Master">
+            <p>Empoloyee Master</p>
+        </a>
+
+        <!-- Exam -->
+        <a href="images/Exam.png" target="_blank" class="gallery-item">
+            <img src="images/Exam.png" alt="Exam">
+            <p>Exam Section</p>
+        </a>
+
+        <!-- Fee Receipt -->
+        <a href="images/Fee%20Receipt.png" target="_blank" class="gallery-item">
+            <img src="images/Fee%20Receipt.png" alt="Fee Receipt">
+            <p>Fee Receipt</p>
+        </a>
+
+        <!-- I Card -->
+        <a href="images/I%20Card.png" target="_blank" class="gallery-item">
+            <img src="images/I%20Card.png" alt="I Card">
+            <p>I Card Generator</p>
+        </a>
+
+        <!-- Menu -->
+        <a href="images/Menu.png" target="_blank" class="gallery-item">
+            <img src="images/Menu.png" alt="Menu">
+            <p>Main Menu</p>
+        </a>
+
+        <!-- Student Master -->
+        <a href="images/Student%20Master.png" target="_blank" class="gallery-item">
+            <img src="images/Student%20Master.png" alt="Student Master">
+            <p>Student Master</p>
+        </a>
+
+        <!-- Student Pramotain -->
+        <a href="images/Student%20Pramotain.png" target="_blank" class="gallery-item">
+            <img src="images/Student%20Pramotain.png" alt="Student Promotion">
+            <p>Student Pramotain</p>
+        </a>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2026 Shantiraman Software Solutions.</p>
+</footer>
+
+</body>
+</html>
