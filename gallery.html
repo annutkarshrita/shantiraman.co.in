@@ -6,47 +6,57 @@
     <title>Software Gallery - Shantiraman ERP</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background: #f4f7f6; }
-        header { background: #2c3e50; color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-size: 1.6rem; font-weight: bold; }
-        nav a { color: white; text-decoration: none; margin-left: 20px; }
+        header { background: #2c3e50; color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .logo-text { font-size: 1.6rem; font-weight: bold; letter-spacing: 1px; }
+        nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; }
 
         .gallery-container { padding: 40px 5%; text-align: center; }
+        .gallery-container h1 { color: #2c3e50; margin-bottom: 10px; }
         
         .gallery-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
-            gap: 20px; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 25px; 
             margin-top: 30px; 
         }
 
         .gallery-item { 
-            background: #87CEEB; 
-            border-radius: 12px; 
-            padding: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: 0.3s ease;
+            background: white; /* Premium look ke liye white background */
+            border-radius: 15px; 
+            padding: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
             text-decoration: none; 
             display: block;
+            border: 1px solid #eee;
         }
         
-        .gallery-item:hover { transform: scale(1.03); background: #00BFFF; }
+        /* Hover karne par halka blue color aur zoom */
+        .gallery-item:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #87CEEB;
+        }
+
+        .img-container { overflow: hidden; border-radius: 10px; height: 140px; }
 
         .gallery-item img { 
             width: 100%; 
-            height: 130px; 
+            height: 100%; 
             object-fit: cover; 
-            border-radius: 8px; 
-            background: white;
+            transition: transform 0.5s ease;
         }
+
+        .gallery-item:hover img { transform: scale(1.1); } /* Image zoom effect */
 
         .gallery-item p { 
-            margin: 10px 0 5px 0; 
-            font-size: 0.9rem; 
+            margin: 15px 0 5px 0; 
+            font-size: 0.95rem; 
             color: #2c3e50; 
-            font-weight: bold; 
+            font-weight: 600; 
         }
 
-        footer { background: #2c3e50; color: white; text-align: center; padding: 20px; margin-top: 50px; }
+        footer { background: #2c3e50; color: white; text-align: center; padding: 25px; margin-top: 60px; }
     </style>
 </head>
 <body>
@@ -59,75 +69,78 @@
 </header>
 
 <section class="gallery-container">
-    <h1>Software Glimpses</h1>
-    <p>Humare ERP ke sabhi forms aur features</p>
+    <h1>Software Glimpses & Events</h1>
+    <p>Humare ERP ke features aur shaikshik gatividhiyan</p>
 
     <div class="gallery-grid">
-        <!-- Admission Form -->
+        <!-- 1. Admission Form -->
         <a href="images/Admission%20Form.png" target="_blank" class="gallery-item">
-            <img src="images/Admission%20Form.png" alt="Admission Form">
+            <div class="img-container"><img src="images/Admission%20Form.png" alt="Admission Form"></div>
             <p>Admission Form</p>
         </a>
 
-        <!-- Attendence -->
+        <!-- 2. Attendence -->
         <a href="images/Attendence.png" target="_blank" class="gallery-item">
-            <img src="images/Attendence.png" alt="Attendance">
-            <p>Attendance</p>
+            <div class="img-container"><img src="images/Attendence.png" alt="Attendance"></div>
+            <p>Attendance System</p>
         </a>
 
-        <!-- Softwere Setup -->
+        <!-- 3. Softwere Setup -->
         <a href="images/Softwere%20Setup.png" target="_blank" class="gallery-item">
-            <img src="images/Softwere%20Setup.png" alt="Software Setup">
-            <p>Softwere Setup</p>
+            <div class="img-container"><img src="images/Softwere%20Setup.png" alt="Software Setup"></div>
+            <p>Software Setup</p>
         </a>
 
-        <!-- Empoloyee Master -->
+        <!-- 4. Empoloyee Master -->
         <a href="images/Empoloyee%20Master.png" target="_blank" class="gallery-item">
-            <img src="images/Empoloyee%20Master.png" alt="Employee Master">
-            <p>Empoloyee Master</p>
+            <div class="img-container"><img src="images/Empoloyee%20Master.png" alt="Employee Master"></div>
+            <p>Employee Master</p>
         </a>
 
-        <!-- Exam -->
+        <!-- 5. Exam -->
         <a href="images/Exam.png" target="_blank" class="gallery-item">
-            <img src="images/Exam.png" alt="Exam">
-            <p>Exam Section</p>
+            <div class="img-container"><img src="images/Exam.png" alt="Exam"></div>
+            <p>Examination Section</p>
         </a>
 
-        <!-- Fee Receipt -->
+        <!-- 6. Fee Receipt -->
         <a href="images/Fee%20Receipt.png" target="_blank" class="gallery-item">
-            <img src="images/Fee%20Receipt.png" alt="Fee Receipt">
-            <p>Fee Receipt</p>
+            <div class="img-container"><img src="images/Fee%20Receipt.png" alt="Fee Receipt"></div>
+            <p>Fee Receipt Generation</p>
         </a>
 
-        <!-- I Card -->
+        <!-- 7. I Card -->
         <a href="images/I%20Card.png" target="_blank" class="gallery-item">
-            <img src="images/I%20Card.png" alt="I Card">
-            <p>I Card Generator</p>
+            <div class="img-container"><img src="images/I%20Card.png" alt="I Card"></div>
+            <p>Smart I-Card Generator</p>
         </a>
 
-        <!-- Menu -->
+        <!-- 8. Menu -->
         <a href="images/Menu.png" target="_blank" class="gallery-item">
-            <img src="images/Menu.png" alt="Menu">
-            <p>Main Menu</p>
+            <div class="img-container"><img src="images/Menu.png" alt="Menu"></div>
+            <p>Main Dashboard</p>
         </a>
 
-        <!-- Student Master -->
+        <!-- 9. Student Master -->
         <a href="images/Student%20Master.png" target="_blank" class="gallery-item">
-            <img src="images/Student%20Master.png" alt="Student Master">
-            <p>Student Master</p>
+            <div class="img-container"><img src="images/Student%20Master.png" alt="Student Master"></div>
+            <p>Student Master Data</p>
         </a>
 
-        <!-- Student Pramotain -->
+        <!-- 10. Student Pramotain -->
         <a href="images/Student%20Pramotain.png" target="_blank" class="gallery-item">
-            <img src="images/Student%20Pramotain.png" alt="Student Promotion">
-            <p>Student Pramotain</p>
+            <div class="img-container"><img src="images/Student%20Pramotain.png" alt="Student Promotion"></div>
+            <p>Student Promotion</p>
+        </a>
+
+        <!-- 11. Innovation Marathon (Sahi jagah juda hua) -->
+        <a href="images/innovation_marathon.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/innovation_marathon.png" alt="Innovation Marathon"></div>
+            <p>Innovation Marathon 25-26</p>
         </a>
     </div>
 </section>
-<div class="gallery-item">
-    <img src="images/innovation_marathon.png" alt="Innovation Marathon">
-    <p>School Innovation Marathon 25-26</p>
-</div>
+
 <footer>
     <p>&copy; 2026 Shantiraman Software Solutions.</p>
 </footer>
