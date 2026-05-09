@@ -27,7 +27,7 @@
             width: 80px; 
             height: 80px; 
             object-fit: cover; 
-            border-radius: 50%; /* standard circle */
+            border-radius: 50%; 
             background: white; 
             image-rendering: -webkit-optimize-contrast; 
         }
@@ -52,7 +52,7 @@
         .hero h1 { font-size: 3rem; margin-bottom: 15px; }
         .hero p { font-size: 1.2rem; max-width: 700px; }
         
-        .btn { background: #e74c3c; color: white; padding: 15px 35px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin-top: 20px; border: none; cursor: pointer;}
+        .btn { background: #e74c3c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin-top: 20px; border: none; cursor: pointer;}
         .btn:hover { background: #c0392b; transform: scale(1.05); }
 
         .section { padding: 60px 10%; text-align: center; }
@@ -61,11 +61,14 @@
         .card img { width: 100%; border-radius: 10px; margin-bottom: 15px; height: 150px; object-fit: cover; border: 1px solid #ddd;}
         .card h3 { color: #2c3e50; margin-bottom: 10px; }
 
-        /* Gallery Preview Section */
         .gallery-preview { background: #87CEEB; color: #2c3e50; padding: 50px 10%; text-align: center; }
 
         .offer { background: #f9f9f9; padding: 50px 10%; text-align: center; }
         .offer-box { background: white; padding: 30px; border-top: 5px solid #e74c3c; display: inline-block; border-radius: 15px; }
+
+        /* Social Media Styling */
+        .social-links a { text-decoration: none; color: #2c3e50; font-weight: bold; margin: 0 10px; padding: 8px 15px; background: #eee; border-radius: 20px; transition: 0.3s; display: inline-block; margin-top: 10px; }
+        .social-links a:hover { background: #e74c3c; color: white; }
 
         footer { background: #2c3e50; color: white; text-align: center; padding: 30px; }
 
@@ -80,13 +83,13 @@
 
 <header>
     <div class="logo-container">
+        <!-- Naya logo path -->
         <img src="images/ShantramanLogo.png" alt="Shantiraman Logo" class="logo-img">
         <span class="logo-text">SHANTIRAMAN</span>
     </div>
     <nav>
         <a href="index.html">Home</a>
         <a href="#features">Features</a>
-        <!-- Yahan gallery.html se link kiya hai -->
         <a href="gallery.html">Gallery</a>
         <a href="#contact">Contact</a>
     </nav>
@@ -101,19 +104,16 @@
 <section id="features" class="section">
     <h2>Hamari Khasiyat (Features)</h2>
     <div class="features">
-        <!-- Admission Card -->
         <div class="card">
             <img src="images/Admission%20Form.png" alt="Admission">
             <h3>Student Master</h3>
-            <p>प्रवेश से लेकर स्थानान्तरण प्रमाण पत्र तक, सब कुछ डिजिटल रिकॉर्ड के साथ ईआरपी में मौजूद है।</p>
+            <p>प्रवेश से लेकर स्थानान्तरण प्रमाण पत्र तक, सब kuch digital record ke sath ERP mein मौजूद है।</p>
         </div>
-        <!-- Fee Card -->
         <div class="card">
             <img src="images/Fee%20Receipt.png" alt="Fees">
             <h3>Fee Management</h3>
             <p>Digital fee receipts aur monthly reports ka asaan management.</p>
         </div>
-        <!-- Exam Card -->
         <div class="card">
             <img src="images/Exam.png" alt="Exam">
             <h3>Academic Report</h3>
@@ -122,21 +122,20 @@
     </div>
 </section>
 
-<!-- Naya Gallery Preview Section -->
 <section id="gallery" class="gallery-preview">
     <h2>Software Glimpses</h2>
     <p>Humare ERP software ke forms aur dashboard dekhne ke liye niche button par click karein.</p>
     <a href="gallery.html" class="btn" style="background: #2c3e50;">View All Screenshots</a>
 </section>
 
-https://github.com/annutkarshrita/shantiraman.co.in/blob/main/index.html
-
 <section id="contact" class="section">
-    <h2>Contect Me</h2>
-    <p><strong>Email:</strong> annutkarshrita@gmail.com </p>
-    <p><strong>Facebook:</strong> https://www.facebook.com/annutkarsh </p>
-    <p><strong>Instagram:</strong> https://www.instagram.com/annutkarshrita </p>
-    <p><strong>WhatsApp:</strong> +91-9415469746</p>
+    <h2>Contact Me</h2>
+    <p><strong>Email:</strong> <a href="mailto:annutkarshrita@gmail.com" style="color: #e74c3c; text-decoration: none;">annutkarshrita@gmail.com</a></p>
+    <div class="social-links">
+        <a href="https://www.facebook.com/annutkarsh" target="_blank">Facebook</a>
+        <a href="https://www.instagram.com/annutkarshrita" target="_blank">Instagram</a>
+        <a href="https://wa.me/919415469746" target="_blank" style="background: #25D366; color: white;">WhatsApp</a>
+    </div>
 </section>
 
 <footer>
