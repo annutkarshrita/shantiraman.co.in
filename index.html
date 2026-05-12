@@ -24,17 +24,23 @@
         .logo-container { display: flex; align-items: center; }
         
         /* Logo Circle Fit - Premium look */
-        .logo-img { 
-        width: 50px;          /* Box ko thoda chota kiya */
-        height: 50px; 
-        object-fit: cover;    /* 'contain' ki jagah 'cover' se logo bada dikhega */
-        border-radius: 50%; 
-        background: white; 
-        padding: 2px;         /* Padding kam ki taaki design gole mein bhara hua lage */
-        border: 2px solid #ecf0f1;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        display: block;
-        }
+       .logo-img { 
+    width: 85px;          /* Size bada kar diya */
+    height: 85px;         /* Height bhi badha di */
+    object-fit: contain;  /* 'contain' hi rakhein taaki logo ka design na kate */
+    border-radius: 50%;   /* Poora gola (circle) banane ke liye 50% zaroori hai */
+    background: white; 
+    padding: 2px;         /* Bahut halki padding taaki design kinaro se na takraye */
+    border: 2px solid #ecf0f1;
+    box-shadow: 0 0 12px rgba(0,0,0,0.3);
+    display: block;
+    transition: 0.3s;     /* Smooth look ke liye */
+}
+
+/* Hover karne par halka sa aur bada dikhega */
+.logo-img:hover {
+    transform: scale(1.05);
+}
         
         .logo-text { font-size: 1.6rem; font-weight: bold; margin-left: 15px; color: #ecf0f1; letter-spacing: 1px; }
 
