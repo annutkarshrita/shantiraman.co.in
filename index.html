@@ -19,18 +19,16 @@
             top: 0; 
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .logo-container { display: flex; align-items: center; }
-        
-        .logo-img { 
-            width: 60 px; 
-            height: 60 px; 
-            object-fit: cover; 
-            border-radius: 60%; 
-            background: white; 
-            image-rendering: -webkit-optimize-contrast; 
-        }
+    logo-img { 
+    width: 70px;         /* Size thoda chota kiya taaki gole mein saans lene ki jagah ho */
+    height: 70px; 
+    object-fit: contain; /* Isse pura logo bina kate gole ke andar rahega */
+    border-radius: 50%;  /* Gola banane ke liye */
+    background: white;   /* Logo ke peeche saaf safed rang */
+    padding: 5px;        /* Logo aur gole ke border ke beech thodi jagah (gap) */
+    box-shadow: 0 0 10px rgba(0,0,0,0.2); /* Premium look ke liye halki shadow */
+    border: 2px solid #ecf0f1; /* Gole ke charo taraf ek patli sundar line */
+    }
         .logo-text { font-size: 1.6rem; font-weight: bold; margin-left: 15px; color: #ecf0f1; letter-spacing: 1px; }
 
         nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
