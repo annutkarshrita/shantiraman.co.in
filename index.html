@@ -1,167 +1,168 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shantiraman - Smart School ERP Solutions</title>
-    <style>
-        /* --- CSS STYLE SECTION --- */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; scroll-behavior: smooth; }
-        
-        header { 
-            background: #2c3e50; 
-            color: white; 
-            padding: 10px 5%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            { 
-                    width: 70px;         /* Size thoda chota kiya taaki gole mein saans lene ki jagah ho */
-                    height: 70px; 
-                    object-fit: contain; /* Isse pura logo bina kate gole ke andar rahega */
-                    border-radius: 50%;  /* Gola banane ke liye */
-                    background: white;   /* Logo ke peeche saaf safed rang */
-                    padding: 0px;        /* Logo aur gole ke border ke beech thodi jagah (gap) */
-                    box-shadow: 0 0 10px rgba(0,0,0,0.2); /* Premium look ke liye halki shadow */
-                    border: 2px solid #ecf0f1; /* Gole ke charo taraf ek patli sundar line */
-           }
-        .logo-text { font-size: 1.6rem; font-weight: bold; margin-left: 15px; color: #ecf0f1; letter-spacing: 1px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shantiraman - Smart School ERP Solutions</title>
+    <style>
+        /* --- CSS STYLE SECTION --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; scroll-behavior: smooth; }
+        
+        header { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 10px 5%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
 
-        nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
-        nav a:hover { color: #e74c3c; }
-        
-        .hero { 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1510074377623-8cf13fb86c08?auto=format&fit=crop&w=1350&q=80'); 
-            background-size: cover; 
-            background-position: center;
-            color: white; 
-            height: 60vh; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding: 0 20px; 
-        }
-        .hero h1 { font-size: 3rem; margin-bottom: 15px; }
-        .hero p { font-size: 1.2rem; max-width: 700px; }
-        
-        .btn { background: #e74c3c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin-top: 20px; border: none; cursor: pointer;}
-        .btn:hover { background: #c0392b; transform: scale(1.05); }
+        .logo-container { display: flex; align-items: center; }
+        
+        .logo-img { 
+            width: 80px; 
+            height: 80px; 
+            object-fit: cover; 
+            border-radius: 50%; 
+            background: white; 
+            image-rendering: -webkit-optimize-contrast; 
+        }
+        .logo-text { font-size: 1.6rem; font-weight: bold; margin-left: 15px; color: #ecf0f1; letter-spacing: 1px; }
 
-        .section { padding: 60px 10%; text-align: center; }
-        .features { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 40px; }
-        .card { flex: 1; min-width: 280px; max-width: 350px; padding: 20px; border: 1px solid #eee; border-radius: 15px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .card img { width: 100%; border-radius: 10px; margin-bottom: 15px; height: 150px; object-fit: cover; border: 1px solid #ddd;}
-        .card h3 { color: #2c3e50; margin-bottom: 10px; }
+        nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
+        nav a:hover { color: #e74c3c; }
+        
+        .hero { 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1510074377623-8cf13fb86c08?auto=format&fit=crop&w=1350&q=80'); 
+            background-size: cover; 
+            background-position: center;
+            color: white; 
+            height: 60vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 0 20px; 
+        }
+        .hero h1 { font-size: 3rem; margin-bottom: 15px; }
+        .hero p { font-size: 1.2rem; max-width: 700px; }
+        
+        .btn { background: #e74c3c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin-top: 20px; border: none; cursor: pointer;}
+        .btn:hover { background: #c0392b; transform: scale(1.05); }
 
-        .gallery-preview { background: #87CEEB; color: #2c3e50; padding: 50px 10%; text-align: center; }
+        .section { padding: 60px 10%; text-align: center; }
+        .features { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 40px; }
+        .card { flex: 1; min-width: 280px; max-width: 350px; padding: 20px; border: 1px solid #eee; border-radius: 15px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .card img { width: 100%; border-radius: 10px; margin-bottom: 15px; height: 150px; object-fit: cover; border: 1px solid #ddd;}
+        .card h3 { color: #2c3e50; margin-bottom: 10px; }
 
-        /* Offer Box Enhancement */
-        .offer-box { background: white; padding: 40px; border-radius: 20px; border: 2px dashed #e74c3c; box-shadow: 0 10px 30px rgba(231, 76, 60, 0.1); display: inline-block; max-width: 800px; }
+        .gallery-preview { background: #87CEEB; color: #2c3e50; padding: 50px 10%; text-align: center; }
 
-        /* Social Media Styling */
-        .social-links a { text-decoration: none; color: #2c3e50; font-weight: bold; margin: 5px 10px; padding: 8px 15px; background: #eee; border-radius: 20px; transition: 0.3s; display: inline-block; }
-        .social-links a:hover { background: #e74c3c; color: white; }
+        /* Offer Box Enhancement */
+        .offer-box { background: white; padding: 40px; border-radius: 20px; border: 2px dashed #e74c3c; box-shadow: 0 10px 30px rgba(231, 76, 60, 0.1); display: inline-block; max-width: 800px; }
 
-        footer { background: #2c3e50; color: white; text-align: center; padding: 30px; }
+        /* Social Media Styling */
+        .social-links a { text-decoration: none; color: #2c3e50; font-weight: bold; margin: 5px 10px; padding: 8px 15px; background: #eee; border-radius: 20px; transition: 0.3s; display: inline-block; }
+        .social-links a:hover { background: #e74c3c; color: white; }
 
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            header { flex-direction: column; }
-            nav { margin-top: 15px; }
-            .hero { height: auto; padding: 60px 20px; }
-        }
-    </style>
+        footer { background: #2c3e50; color: white; text-align: center; padding: 30px; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            header { flex-direction: column; }
+            nav { margin-top: 15px; }
+            .hero { height: auto; padding: 60px 20px; }
+        }
+    </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-container">
-        <img src="images/ShantramanLogo.png" 
-             alt="Logo" 
-             class="logo-img" 
-             onerror="this.onerror=null; this.src='ShantramanLogo.png'; if(!this.src) this.src='./ShantramanLogo.png';">
-        <span class="logo-text">SHANTIRAMAN</span>
-    </div>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="#features">Features</a>
-        <a href="gallery.html">Gallery</a>
-        <a href="#contact">Contact</a>
-    </nav>
+    <div class="logo-container">
+        <!-- Path fixed: ShantramanLogo.png (bin-i ke) -->
+        <img src="images/ShantramanLogo.png" alt="Logo" class="logo-img" onerror="this.src='ShantramanLogo.png'">
+        <span class="logo-text">SHANTIRAMAN</span>
+    </div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="#features">Features</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="#contact">Contact</a>
+    </nav>
 </header>
 
 <section class="hero">
-    <h1>Smart School ERP Software</h1>
-    <p>School management ko digital banayein. Admission, Fees aur Exams—sab kuch ek click par.</p>
-    <a href="https://wa.me/919415469746" target="_blank" class="btn">Free Demo Ke Liye Message Karein</a>
+    <h1>Smart School ERP Software</h1>
+    <p>School management ko digital banayein. Admission, Fees aur Exams—sab kuch ek click par.</p>
+    <a href="https://wa.me/919415469746" target="_blank" class="btn">Free Demo Ke Liye Message Karein</a>
 </section>
 
 <section id="features" class="section">
-    <h2>Hamari Khasiyat (Features)</h2>
-    <div class="features">
-        <div class="card">
-            <img src="images/Admission%20Form.png" alt="Admission">
-            <h3>Student Master</h3>
-            <p>प्रवेश से लेकर स्थानान्तरण प्रमाण पत्र तक, सब digital record ke sath ERP mein मौजूद है।</p>
-        </div>
-        <div class="card">
-            <img src="images/Fee%20Receipt.png" alt="Fees">
-            <h3>Fee Management</h3>
-            <p>Digital fee receipts aur monthly reports ka asaan management.</p>
-        </div>
-        <div class="card">
-            <img src="images/Exam.png" alt="Exam">
-            <h3>Academic Report</h3>
-            <p>Exam marks aur report cards turant generate karein.</p>
-        </div>
-    </div>
+    <h2>Hamari Khasiyat (Features)</h2>
+    <div class="features">
+        <div class="card">
+            <img src="images/Admission%20Form.png" alt="Admission">
+            <h3>Student Master</h3>
+            <p>प्रवेश से लेकर स्थानान्तरण प्रमाण पत्र तक, सब digital record ke sath ERP mein मौजूद है।</p>
+        </div>
+        <div class="card">
+            <img src="images/Fee%20Receipt.png" alt="Fees">
+            <h3>Fee Management</h3>
+            <p>Digital fee receipts aur monthly reports ka asaan management.</p>
+        </div>
+        <div class="card">
+            <img src="images/Exam.png" alt="Exam">
+            <h3>Academic Report</h3>
+            <p>Exam marks aur report cards turant generate karein.</p>
+        </div>
+    </div>
 </section>
 
 <!-- Dhamaka Offer Section -->
 <section class="offer" style="padding: 60px 10%; background: #fdf2f2; text-align: center;">
-    <div class="offer-box">
-        <h2 style="color: #e74c3c; font-size: 2.2rem; margin-bottom: 10px;">Dhamaka Offer! 🚀</h2>
-        <p style="font-size: 1.3rem; color: #2c3e50; font-weight: bold; margin-bottom: 15px;">
-            Naye Schools ke liye <span style="background: #ffeb3b; padding: 2px 10px; border-radius: 5px;">Flat 40% Discount</span>
-        </p>
-        
-        <ul style="list-style: none; padding: 0; color: #555; font-size: 1.1rem; margin-bottom: 25px; text-align: left; display: inline-block;">
-            <li>✅ 1 Saal ki Free Technical Support</li>
-            <li>✅ Online + Offline Setup Ki Suvidha</li>
-            <li>✅ Unlimited Student Records Management</li>
-        </ul><br>
+    <div class="offer-box">
+        <h2 style="color: #e74c3c; font-size: 2.2rem; margin-bottom: 10px;">Dhamaka Offer! 🚀</h2>
+        <p style="font-size: 1.3rem; color: #2c3e50; font-weight: bold; margin-bottom: 15px;">
+            Naye Schools ke liye <span style="background: #ffeb3b; padding: 2px 10px; border-radius: 5px;">Flat 40% Discount</span>
+        </p>
+        
+        <ul style="list-style: none; padding: 0; color: #555; font-size: 1.1rem; margin-bottom: 25px; text-align: left; display: inline-block;">
+            <li>✅ 1 Saal ki Free Technical Support</li>
+            <li>✅ Online + Offline Setup Ki Suvidha</li>
+            <li>✅ Unlimited Student Records Management</li>
+        </ul><br>
 
-        <a href="https://wa.me/919415469746" target="_blank" class="btn" style="border-radius: 50px; padding: 15px 40px;">
-            Apna Discount Book Karein
-        </a>
-    </div>
+        <a href="https://wa.me/919415469746" target="_blank" class="btn" style="border-radius: 50px; padding: 15px 40px;">
+            Apna Discount Book Karein
+        </a>
+    </div>
 </section>
 
 <section id="gallery" class="gallery-preview">
-    <h2>Software Glimpses</h2>
-    <p>Humare ERP software ke forms aur dashboard dekhne ke liye niche button par click karein.</p>
-    <a href="gallery.html" class="btn" style="background: #2c3e50;">View All Screenshots</a>
+    <h2>Software Glimpses</h2>
+    <p>Humare ERP software ke forms aur dashboard dekhne ke liye niche button par click karein.</p>
+    <a href="gallery.html" class="btn" style="background: #2c3e50;">View All Screenshots</a>
 </section>
 
 <section id="contact" class="section">
-    <h2>Contact Me</h2>
-    <p><strong>Email:</strong> <a href="mailto:annutkarshrita@gmail.com" style="color: #e74c3c; text-decoration: none;">annutkarshrita@gmail.com</a></p>
-    <div class="social-links">
-        <a href="https://www.facebook.com/annutkarsh" target="_blank">Facebook</a>
-        <a href="https://www.instagram.com/annutkarshrita" target="_blank">Instagram</a>
-        <a href="https://wa.me/919415469746" target="_blank" style="background: #25D366; color: white;">WhatsApp</a>
-    </div>
+    <h2>Contact Me</h2>
+    <p><strong>Email:</strong> <a href="mailto:annutkarshrita@gmail.com" style="color: #e74c3c; text-decoration: none;">annutkarshrita@gmail.com</a></p>
+    <div class="social-links">
+        <a href="https://www.facebook.com/annutkarsh" target="_blank">Facebook</a>
+        <a href="https://www.instagram.com/annutkarshrita" target="_blank">Instagram</a>
+        <a href="https://wa.me/919415469746" target="_blank" style="background: #25D366; color: white;">WhatsApp</a>
+    </div>
 </section>
 
 <footer>
-    <p>&copy; 2026 Shantiraman Software Solutions.</p>
+    <p>&copy; 2026 Shantiraman Software Solutions.</p>
 </footer>
 
 </body>
+</html> bhi is code se logo load nhi ho rha hai </body>
 </html>
