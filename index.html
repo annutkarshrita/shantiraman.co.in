@@ -6,7 +6,7 @@
     <title>Shantiraman - Smart School ERP Solutions</title>
     <style>
         /* --- CSS STYLE SECTION --- */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; scroll-behavior: smooth; background: #f9f9f9; }
         
         header { 
             background: #2c3e50; 
@@ -23,19 +23,18 @@
 
         .logo-container { display: flex; align-items: center; }
         
-        /* --- LOGO FIT SETTINGS --- */
-    .logo-img { 
-    width: 75px;        /* Size thoda bada rakha hai */
-    height: 75px; 
-    object-fit: cover;  /* 'contain' ki jagah 'cover' use karein taaki design pura gole mein bhara rahe */
-    border-radius: 50%; 
-    background-color: #ffffff; 
-    padding: 2px;       /* Padding ko kam kiya taaki logo bada dikhe */
-    border: 2px solid #ecf0f1;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    display: block;
-    image-rendering: auto; /* Browsers ko high quality dikhane ke liye */
-    }
+        /* Logo Circle Fit Styling */
+        .logo-img { 
+            width: 70px; 
+            height: 70px; 
+            object-fit: contain; 
+            border-radius: 50%; 
+            background: white; 
+            padding: 5px; 
+            border: 2px solid #ecf0f1;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
         .logo-text { font-size: 1.6rem; font-weight: bold; margin-left: 15px; color: #ecf0f1; letter-spacing: 1px; }
 
         nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
@@ -57,20 +56,26 @@
         .hero h1 { font-size: 3rem; margin-bottom: 15px; }
         .hero p { font-size: 1.2rem; max-width: 700px; }
         
-        .btn { background: #e74c3c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin-top: 20px; border: none; cursor: pointer;}
+        .btn { background: #e74c3c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin-top: 20px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); }
         .btn:hover { background: #c0392b; transform: scale(1.05); }
 
         .section { padding: 60px 10%; text-align: center; }
         .features { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 40px; }
-        .card { flex: 1; min-width: 280px; max-width: 350px; padding: 20px; border: 1px solid #eee; border-radius: 15px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .card img { width: 100%; border-radius: 10px; margin-bottom: 15px; height: 150px; object-fit: cover; border: 1px solid #ddd;}
+        .card { flex: 1; min-width: 280px; max-width: 350px; padding: 20px; border: 1px solid #eee; border-radius: 15px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 100%; border-radius: 10px; margin-bottom: 15px; height: 160px; object-fit: cover; border: 1px solid #ddd; }
         .card h3 { color: #2c3e50; margin-bottom: 10px; }
+
+        /* Offer Section Styling */
+        .offer { background: #fdf2f2; padding: 60px 10%; text-align: center; }
+        .offer-box { background: white; padding: 40px; border-radius: 20px; border: 2px dashed #e74c3c; box-shadow: 0 10px 30px rgba(231, 76, 60, 0.1); display: inline-block; max-width: 800px; }
+        .offer-badge { background: #ffeb3b; padding: 2px 10px; border-radius: 5px; color: #333; }
 
         .gallery-preview { background: #87CEEB; color: #2c3e50; padding: 50px 10%; text-align: center; }
 
-        .offer-box { background: white; padding: 40px; border-radius: 20px; border: 2px dashed #e74c3c; box-shadow: 0 10px 30px rgba(231, 76, 60, 0.1); display: inline-block; max-width: 800px; }
-
-        .social-links a { text-decoration: none; color: #2c3e50; font-weight: bold; margin: 5px 10px; padding: 8px 15px; background: #eee; border-radius: 20px; transition: 0.3s; display: inline-block; }
+        /* Contact & Social Styling */
+        .social-links { margin-top: 20px; }
+        .social-links a { text-decoration: none; color: #2c3e50; font-weight: bold; margin: 5px 10px; padding: 10px 20px; background: #eee; border-radius: 30px; transition: 0.3s; display: inline-block; }
         .social-links a:hover { background: #e74c3c; color: white; }
 
         footer { background: #2c3e50; color: white; text-align: center; padding: 30px; }
@@ -78,7 +83,7 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2rem; }
             header { flex-direction: column; text-align: center; }
-            nav { margin-top: 15px; }
+            nav { margin-top: 15px; margin-bottom: 10px; }
             .logo-container { flex-direction: column; }
             .logo-text { margin-left: 0; margin-top: 10px; }
         }
@@ -86,12 +91,14 @@
 </head>
 <body>
 
-<div class="logo-container">
-    <img src="Shantiramanlogo.png?v=1.2" 
-         alt="Shantiraman Logo" 
-         class="logo-img">
-    <span class="logo-text">SHANTIRAMAN</span>
-</div>   
+<header>
+    <div class="logo-container">
+        <img src="Shantiramanlogo.png?v=1.3" 
+             alt="Logo" 
+             class="logo-img" 
+             onerror="this.src='Shantiramanlogo.png'">
+        <span class="logo-text">SHANTIRAMAN</span>
+    </div>
     <nav>
         <a href="index.html">Home</a>
         <a href="#features">Features</a>
@@ -99,6 +106,7 @@
         <a href="#contact">Contact</a>
     </nav>
 </header>
+
 <section class="hero">
     <h1>Smart School ERP Software</h1>
     <p>School management ko digital banayein. Admission, Fees aur Exams—sab kuch ek click par.</p>
@@ -109,28 +117,28 @@
     <h2>Hamari Khasiyat (Features)</h2>
     <div class="features">
         <div class="card">
-            <img src="images/Admission%20Form.png" alt="Admission">
+            <img src="images/Admission%20Form.png" alt="Student Management">
             <h3>Student Master</h3>
             <p>प्रवेश से लेकर स्थानान्तरण प्रमाण पत्र तक, सब digital record ke sath ERP mein मौजूद है।</p>
         </div>
         <div class="card">
-            <img src="images/Fee%20Receipt.png" alt="Fees">
+            <img src="images/Fee%20Receipt.png" alt="Fee Management">
             <h3>Fee Management</h3>
-            <p>Digital fee receipts aur monthly reports ka asaan management.</p>
+            <p>Digital fee receipts aur monthly reports ka asaan aur fast management system.</p>
         </div>
         <div class="card">
-            <img src="images/Exam.png" alt="Exam">
+            <img src="images/Exam.png" alt="Exam Management">
             <h3>Academic Report</h3>
-            <p>Exam marks aur report cards turant generate karein.</p>
+            <p>Exam marks management aur report cards turant generate karne ki suvidha.</p>
         </div>
     </div>
 </section>
 
-<section class="offer" style="padding: 60px 10%; background: #fdf2f2; text-align: center;">
+<section class="offer">
     <div class="offer-box">
         <h2 style="color: #e74c3c; font-size: 2.2rem; margin-bottom: 10px;">Dhamaka Offer! 🚀</h2>
         <p style="font-size: 1.3rem; color: #2c3e50; font-weight: bold; margin-bottom: 15px;">
-            Naye Schools ke liye <span style="background: #ffeb3b; padding: 2px 10px; border-radius: 5px;">Flat 40% Discount</span>
+            Naye Schools ke liye <span class="offer-badge">Flat 40% Discount</span>
         </p>
         <ul style="list-style: none; padding: 0; color: #555; font-size: 1.1rem; margin-bottom: 25px; text-align: left; display: inline-block;">
             <li>✅ 1 Saal ki Free Technical Support</li>
@@ -145,8 +153,8 @@
 
 <section id="gallery" class="gallery-preview">
     <h2>Software Glimpses</h2>
-    <p>Humare ERP software ke forms aur dashboard dekhne ke liye niche button par click karein.</p>
-    <a href="gallery.html" class="btn" style="background: #2c3e50;">View All Screenshots</a>
+    <p>Humare ERP software ke dashboard aur features dekhne ke liye niche button par click karein.</p>
+    <a href="gallery.html" class="btn" style="background: #2c3e50;">View Full Gallery</a>
 </section>
 
 <section id="contact" class="section">
@@ -160,7 +168,7 @@
 </section>
 
 <footer>
-    <p>&copy; 2026 Shantiraman Software Solutions.</p>
+    <p>&copy; 2026 Shantiraman Software Solutions. All Rights Reserved.</p>
 </footer>
 
 </body>
