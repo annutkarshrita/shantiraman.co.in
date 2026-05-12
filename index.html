@@ -84,8 +84,10 @@
 
 <header>
     <div class="logo-container">
-        <!-- Path fixed: ShantramanLogo.png (bin-i ke) -->
-        <img src="images/ShantramanLogo.png" alt="Logo" class="logo-img" onerror="this.src='ShantramanLogo.png'">
+        <img src="images/ShantramanLogo.png" 
+             alt="Logo" 
+             class="logo-img" 
+             onerror="this.onerror=null; this.src='ShantramanLogo.png'; if(!this.src) this.src='./ShantramanLogo.png';">
         <span class="logo-text">SHANTIRAMAN</span>
     </div>
     <nav>
