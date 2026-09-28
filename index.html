@@ -65,6 +65,11 @@
             display: block;
         }
 
+        /* Mobile: Login panel can also be opened by tapping Login */
+        .login-menu.open .login-panel {
+            display: block;
+        }
+
         .login-panel h3 {
             margin: 0 0 12px;
             color: #2c3e50;
@@ -117,8 +122,23 @@
         }
 
         @media (max-width: 768px) {
+            .login-menu {
+                position: static;
+            }
+
             .login-panel {
-                right: -70px;
+                position: fixed;
+                right: 10px;
+                top: 75px;
+                width: min(300px, calc(100vw - 20px));
+                max-width: calc(100vw - 20px);
+                box-sizing: border-box;
+                border-radius: 10px;
+            }
+
+            .login-panel select,
+            .login-panel button {
+                font-size: 14px;
             }
         }
         
@@ -175,8 +195,8 @@
         <a href="gallery.html">Gallery</a>
         <a href="#contact">Contact</a>
 
-        <div class="login-menu">
-            <a href="javascript:void(0);">Login</a>
+        <div class="login-menu" id="loginMenu">
+            <a href="#" onclick="toggleLoginPanel(event);">Login</a>
 
             <div class="login-panel">
                 <h3>Select School</h3>
@@ -198,6 +218,12 @@
     </nav>
 
     <script>
+        function toggleLoginPanel(event) {
+            if (event) event.preventDefault();
+            const menu = document.getElementById("loginMenu");
+            menu.classList.toggle("open");
+        }
+
         function openLoginTypes() {
             const school = document.getElementById("schoolSelect").value;
             const box = document.getElementById("loginTypes");
