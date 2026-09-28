@@ -176,7 +176,7 @@
         <a href="#contact">Contact</a>
 
         <div class="login-menu">
-            <a href="login.html">Login</a>
+            <a href="javascript:void(0);">Login</a>
 
             <div class="login-panel">
                 <h3>Select School</h3>
@@ -230,7 +230,7 @@
                 return false;
             }
 
-            window.location.href = "https://login.shantiraman.co.in";
+            window.location.href = "/login?school=" + encodeURIComponent(school);
             return false;
         }
     </script>
