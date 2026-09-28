@@ -166,7 +166,7 @@
 
 <header>
     <div class="logo-container">
-        <img src="Shatiramanlogo.jpg" alt="Logo" class="logo-img">
+        <img src="Shantiramanlogo.png" alt="Logo" class="logo-img">
         <span class="logo-text">SHANTIRAMAN</span>
     </div>
     <nav>
@@ -175,65 +175,10 @@
         <a href="gallery.html">Gallery</a>
         <a href="#contact">Contact</a>
 
-        <div class="login-menu">
-            <a href="login.html">Login</a>
-
-            <div class="login-panel">
-                <h3>Select School</h3>
-
-                <select id="schoolSelect" aria-label="Select School">
-                    <option value="">-- Select School --</option>
-                    <option value="ramraji">RAMRAJI SARASWATI BALIKA VIDYA MANDIR INTER COLLEGE</option>
-                </select>
-
-                <button type="button" onclick="openLoginTypes()">Continue</button>
-
-                <div id="loginTypes" class="login-types" style="display:none;">
-                    <a href="#" onclick="goToERPLogin(); return false;">School</a>
-                    <a href="#" onclick="goToLogin('studentlogin.html'); return false;">Student</a>
-                    <a href="#" onclick="goToLogin('guardianlogin.html'); return false;">Guardian</a>
-                </div>
-            </div>
-        </div>
+        <a href="login.html">Login</a>
     </nav>
 
-    <script>
-        function openLoginTypes() {
-            const school = document.getElementById("schoolSelect").value;
-            const box = document.getElementById("loginTypes");
 
-            if (!school) {
-                alert("कृपया पहले School Select करें।");
-                return;
-            }
-
-            box.style.display = "flex";
-        }
-
-        function goToLogin(page) {
-            const school = document.getElementById("schoolSelect").value;
-
-            if (!school) {
-                alert("कृपया पहले School Select करें।");
-                return false;
-            }
-
-            window.location.href = page + "?school=" + encodeURIComponent(school);
-            return false;
-        }
-
-        function goToERPLogin() {
-            const school = document.getElementById("schoolSelect").value;
-
-            if (!school) {
-                alert("कृपया पहले School Select करें।");
-                return false;
-            }
-
-            window.location.href = "https://login.shantiraman.co.in";
-            return false;
-        }
-    </script>
 </header>
 
 <section class="hero">
