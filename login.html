@@ -42,7 +42,7 @@ button:hover{background:#142f54}
 <div class="msg success">{{ reset_success }}</div>
 {% endif %}
 
-<form method="POST" action="{{ url_for('login_alias', school=session.get('school_code','')) }}">
+<form method="POST" action="/login">
     <label for="role">Role</label>
     <select id="role" name="role" required>
         <option value="">-- Role Select करें --</option>
