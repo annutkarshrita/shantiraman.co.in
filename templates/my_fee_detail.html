@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Fee Detail</title><style>
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}.wrap{max-width:1000px;margin:auto;padding:15px}.head,.box{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 4px 15px #0001}.head{background:#17365d;color:#fff}.back{display:inline-block;margin-bottom:12px;text-decoration:none;color:#17365d;font-weight:bold}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#f8fafc;border-radius:10px;padding:14px}.stat b{display:block;font-size:18px;margin-top:5px}.paid{color:#166534}.bal{color:#b91c1c}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#eaf0f7}.error{background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px}@media(max-width:650px){.summary{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<a class="back" href="{{ url_for('my_fee') }}">← My Fee</a>
+{% if error %}<div class="error">{{ error }}</div>{% elif student %}
+<div class="head"><h2 style="margin:0 0 5px">{{ student.name }}</h2>Sr No: {{ student.srno }} | {{ class_name }} - {{ section }}</div>
+<div class="box summary"><div class="stat">Total Fee<b>₹ {{ '%.2f'|format(student.total_fee) }}</b></div><div class="stat paid">Paid Fee<b>₹ {{ '%.2f'|format(student.total_paid) }}</b></div><div class="stat bal">Balance<b>₹ {{ '%.2f'|format(student.balance) }}</b></div></div>
+<div class="box"><h3 style="margin-top:0">Month Wise Fee</h3><div class="tablewrap"><table><thead><tr><th>SL</th><th>Month</th><th>Fee</th><th>Paid</th><th>Balance</th></tr></thead><tbody>{% for m in student.months %}<tr><td>{{ loop.index }}</td><td>{{ m.month }}</td><td>₹ {{ '%.2f'|format(m.fee) }}</td><td class="paid">₹ {{ '%.2f'|format(m.paid) }}</td><td class="bal">₹ {{ '%.2f'|format(m.balance) }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% endif %}</div></body></html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attendance - Shantiraman ERP</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#eef3f8;color:#17365d}.wrap{max-width:1100px;margin:auto;padding:15px}.top{background:#28558c;color:#fff;border-radius:14px;padding:16px 18px;margin-bottom:14px}.top h2{margin:0 0 5px}.meta{opacity:.95}.box{background:#fff;border-radius:14px;box-shadow:0 2px 10px #d9dee5;padding:16px;margin-bottom:14px}.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.bar input{padding:10px;border:1px solid #cbd5e1;border-radius:8px}.btn{display:inline-block;padding:10px 16px;border:0;border-radius:9px;background:#28558c;color:#fff;text-decoration:none;font-weight:bold;cursor:pointer}.btn.gray{background:#64748b}.btn.green{background:#15803d}.msg{padding:10px 12px;border-radius:9px;margin-bottom:12px}.ok{background:#dcfce7;color:#166534}.err{background:#fee2e2;color:#991b1b}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:820px}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}th{background:#f1f5f9}.status{display:flex;gap:10px;flex-wrap:wrap}.status label{padding:6px 10px;border:1px solid #dbe3ec;border-radius:8px;background:#f8fafc;cursor:pointer}.status input{accent-color:#28558c}.head-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a href="{{ url_for('teacher_dashboard') }}" class="btn gray" style="margin-bottom:12px">← Dashboard</a>
+<div class="top">
+<h2>Student Attendance</h2>
+<div class="meta"><b>Class:</b> {{ class_name }} &nbsp; | &nbsp; <b>Section:</b> {{ section }} &nbsp; | &nbsp; <b>Session:</b> {{ session_name }}</div>
+<div class="meta"><b>Teacher:</b> {{ teacher_name }}</div>
+</div>
+<div class="box">
+<form method="get" class="bar">
+<label><b>Date:</b> <input type="date" name="date" value="{{ selected_date }}" required></label>
+<button class="btn" type="submit">Load</button>
+<label style="margin-left:auto"><input type="checkbox" id="markAll"> <b>Present All</b></label>
+</form>
+</div>
+{% if error %}<div class="msg err">{{ error }}</div>{% endif %}
+{% if success %}<div class="msg ok">{{ success }}</div>{% endif %}
+<div class="box">
+<form method="post">
+<input type="hidden" name="date" value="{{ selected_date }}">
+<div class="head-actions" style="margin-bottom:12px">
+<div><b>Total Students: {{ students|length }}</b></div>
+<button class="btn green" type="submit" {% if not students %}disabled{% endif %}>Save Attendance</button>
+</div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>SL</th><th>Sr No</th><th>Student Name</th><th>Father's Name</th><th>Attendance</th></tr></thead>
+<tbody>
+{% for s in students %}
+<tr>
+<td>{{ loop.index }}</td><td>{{ s.srno }}</td><td>{{ s.name }}</td><td>{{ s.father }}</td>
+<td>
+<div class="status">
+<label><input type="radio" class="att" name="att_{{ s.id }}" value="Present" {% if s.status=='Present' or not s.status %}checked{% endif %}> Present</label>
+<label><input type="radio" class="att" name="att_{{ s.id }}" value="Absent" {% if s.status=='Absent' %}checked{% endif %}> Absent</label>
+<label><input type="radio" class="att" name="att_{{ s.id }}" value="Medical" {% if s.status=='Medical' %}checked{% endif %}> Medical</label>
+</div>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</form>
+</div>
+<div class="box">
+<a class="btn" href="{{ url_for('attendance_report',mode='date',date=selected_date) }}">Date Wise Report</a>
+<a class="btn" href="{{ url_for('attendance_report',mode='month') }}">Month Wise Report</a>
+<a class="btn" href="{{ url_for('attendance_report',mode='range') }}">Date Range Report</a>
+</div>
+</div>
+<script>
+const markAll=document.getElementById('markAll');
+markAll.addEventListener('change',()=>{
+  document.querySelectorAll('input.att[value="Present"]').forEach(x=>x.checked=markAll.checked);
+});
+</script>
+</body>
+</html>

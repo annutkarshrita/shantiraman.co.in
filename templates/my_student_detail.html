@@ -1,0 +1,7 @@
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Details</title><style>
+body{margin:0;font-family:Arial;background:#f1f5f9}.wrap{max-width:850px;margin:auto;padding:15px}.box{background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 15px #0001}table{width:100%;border-collapse:collapse}td{padding:9px;border-bottom:1px solid #e2e8f0}td:first-child{font-weight:bold;width:35%}.back{display:inline-block;margin-bottom:12px;text-decoration:none;color:#17365d;font-weight:bold}.error{background:#fee2e2;padding:12px;border-radius:8px;color:#991b1b}</style></head>
+<body><div class="wrap"><a class="back" href="{{ url_for('my_students') }}">← My Students</a><div class="box">
+<h2>{{ student.name if student else 'Student Details' }}</h2>
+{% if error %}<div class="error">{{ error }}</div>{% else %}<table>{% for k,v in details %}<tr><td>{{ k }}</td><td>{{ v }}</td></tr>{% endfor %}</table>{% endif %}
+</div></div></body></html>

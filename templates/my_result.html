@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Result</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#eef3f8;color:#1f2937}
+.top{background:#28558c;color:#fff;padding:16px 18px}
+.top h2{margin:0 0 4px}
+.school{font-size:14px}
+.wrap{max-width:1400px;margin:auto;padding:16px}
+.back{display:inline-block;margin-bottom:12px;text-decoration:none;color:#28558c;font-weight:bold}
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:16px;margin-bottom:14px}
+.info{display:flex;flex-wrap:wrap;gap:14px;font-size:14px}
+.info span{background:#f5f7fa;border-radius:9px;padding:8px 12px}
+.filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+label{font-weight:bold;color:#334155}
+select,button{height:40px;padding:7px 12px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px}
+select{min-width:190px;background:#fff}
+button{background:#28558c;color:#fff;border:0;font-weight:bold;cursor:pointer}
+.error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:1000px;background:#fff}
+th,td{padding:9px 10px;border-bottom:1px solid #e5e7eb;text-align:left;white-space:nowrap}
+th{background:#eaf0f7;color:#1e3a5f}
+.pending{color:#b45309;font-weight:bold}
+.pass{color:#166534;font-weight:bold}
+.fail{color:#991b1b;font-weight:bold}
+.special{color:#7c2d12;font-weight:bold}
+small{color:#64748b}
+</style>
+</head>
+<body>
+<div class="top">
+  <h2>Shantiraman ERP</h2>
+  <div>My Result</div>
+  <div class="school">{{ school_name }}</div>
+</div>
+<div class="wrap">
+  <a class="back" href="{{ url_for('teacher_dashboard') }}">← Dashboard</a>
+
+  <div class="card">
+    <div class="info">
+      <span><b>Class:</b> {{ class_name }}</span>
+      <span><b>Section:</b> {{ section }}</span>
+      <span><b>Session:</b> {{ session_name }}</span>
+      <span><b>Teacher:</b> {{ teacher_name }}</span>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="card error"><b>{{ error }}</b></div>
+  {% endif %}
+
+  <div class="card">
+    <form method="get">
+      <div class="filters">
+        <label>Exam<br>
+          <select name="exam">
+            <option value="">-- Select Exam --</option>
+            {% for e in exams %}
+              <option value="{{ e }}" {% if e==selected_exam %}selected{% endif %}>{{ e }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>Student<br>
+          <select name="student">
+            <option value="">-- All Students --</option>
+            {% for s in students %}
+              <option value="{{ s.id }}" {% if request.args.get('student','')==s.id %}selected{% endif %}>
+                {{ s.srno }} - {{ s.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <button type="submit">Show Result</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th>SL</th>
+          <th>Sr No</th>
+          <th>Student Name</th>
+          {% for s in subjects %}
+          <th>
+            {{ s.subject }}
+            {% if s.subsubject %}<br><small>{{ s.subsubject }}</small>{% endif %}
+          </th>
+          {% endfor %}
+          <th>Total M.M.</th>
+          <th>Total Obt.</th>
+          <th>Percentage</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if rows %}
+          {% for r in rows %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ r.srno }}</td>
+            <td>{{ r.name }}</td>
+            {% for m in r.marks %}<td>{{ m }}</td>{% endfor %}
+            <td>{{ r.total_max }}</td>
+            <td>{{ r.total_obt }}</td>
+            <td>{{ r.percentage or '—' }}</td>
+            <td class="{% if r.status=='PASS' %}pass{% elif r.status=='FAIL' %}fail{% elif r.status in ('ABSENT','MEDICAL') %}special{% else %}pending{% endif %}">
+              {{ r.status }}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="20">कोई Result data नहीं मिला।</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

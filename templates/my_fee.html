@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Fee</title><style>
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}.wrap{max-width:1200px;margin:auto;padding:15px}.head,.box{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 4px 15px #0001}.head{background:#17365d;color:#fff}.back{display:inline-block;margin-bottom:12px;text-decoration:none;color:#17365d;font-weight:bold}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap}th{background:#eaf0f7}.view{padding:7px 11px;border-radius:7px;background:#17365d;color:white;text-decoration:none}.paid{color:#166534;font-weight:bold}.bal{color:#b91c1c;font-weight:bold}.nodue{color:#166534;font-weight:bold}.error{background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px}
+</style></head><body><div class="wrap">
+<a class="back" href="{{ url_for('teacher_dashboard') }}">← Dashboard</a>
+<div class="head"><h2 style="margin:0 0 5px">My Class Fee</h2>{{ class_name }} - {{ section }} | Session: {{ session_name }}</div>
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+<div class="box"><b>Total Students: {{ rows|length }}</b> &nbsp; | &nbsp; यह केवल आपकी assigned Class + Section की Fee है।</div>
+<div class="box tablewrap"><table><thead><tr><th>SL</th><th>Sr No</th><th>Student Name</th><th>Total Fee</th><th>Paid Fee</th><th>Balance</th><th>Status</th><th>View</th></tr></thead>
+<tbody>{% for r in rows %}<tr><td>{{ loop.index }}</td><td>{{ r.srno }}</td><td>{{ r.name }}</td><td>₹ {{ '%.2f'|format(r.total_fee) }}</td><td class="paid">₹ {{ '%.2f'|format(r.total_paid) }}</td><td class="{{ 'bal' if r.balance>0 else 'nodue' }}">₹ {{ '%.2f'|format(r.balance) }}</td><td>{{ r.status }}</td><td><a class="view" href="{{ url_for('my_fee_detail',student_id=r.id) }}">View</a></td></tr>{% endfor %}</tbody></table></div>
+</div></body></html>

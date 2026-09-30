@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attendance Report</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#eef3f8;color:#17365d}.wrap{max-width:1150px;margin:auto;padding:15px}.top,.box{background:#fff;border-radius:14px;box-shadow:0 2px 10px #d9dee5}.top{background:#28558c;color:#fff;padding:16px 18px;margin-bottom:14px}.top h2{margin:0 0 5px}.box{padding:16px;margin-bottom:14px}.filters{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.filters label{font-weight:bold}.filters input,.filters select{padding:9px;border:1px solid #cbd5e1;border-radius:8px}.btn{padding:10px 16px;border:0;border-radius:9px;background:#28558c;color:#fff;font-weight:bold;text-decoration:none;cursor:pointer}.summary{display:flex;gap:10px;flex-wrap:wrap}.pill{background:#f1f5f9;padding:10px 14px;border-radius:9px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:950px}th,td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left}th{background:#f1f5f9}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="btn" href="{{ url_for('attendance') }}">← Attendance</a>
+<div class="top" style="margin-top:12px"><h2>Attendance Report</h2><div><b>Class:</b> {{ class_name }} | <b>Section:</b> {{ section }} | <b>Session:</b> {{ session_name }}</div></div>
+<div class="box"><form method="get" class="filters">
+<label>Report <select name="mode"><option value="date" {% if mode=='date' %}selected{% endif %}>Date Wise</option><option value="month" {% if mode=='month' %}selected{% endif %}>Month Wise</option><option value="range" {% if mode=='range' %}selected{% endif %}>Date Range</option></select></label>
+<label>Date <input type="date" name="date" value="{{ selected_date }}"></label>
+<label>Month <input type="month" name="month" value="{{ month }}"></label>
+<label>From <input type="date" name="from_date" value="{{ from_date }}"></label>
+<label>To <input type="date" name="to_date" value="{{ to_date }}"></label>
+<button class="btn" type="submit">Show Report</button>
+</form></div>
+{% if error %}<div class="box">{{ error }}</div>{% endif %}
+<div class="box"><div class="summary"><div class="pill">Working Days: <b>{{ summary.working }}</b></div><div class="pill">Present: <b>{{ summary.present }}</b></div><div class="pill">Absent: <b>{{ summary.absent }}</b></div><div class="pill">Medical: <b>{{ summary.medical }}</b></div></div></div>
+<div class="box tablewrap"><table><thead><tr><th>SL</th><th>Sr No</th><th>Student Name</th><th>Father's Name</th><th>Working Days</th><th>Present</th><th>Absent</th><th>Medical</th><th>Attendance %</th></tr></thead><tbody>
+{% for r in report %}<tr><td>{{ loop.index }}</td><td>{{ r.srno }}</td><td>{{ r.name }}</td><td>{{ r.father }}</td><td>{{ r.working }}</td><td>{{ r.present }}</td><td>{{ r.absent }}</td><td>{{ r.medical }}</td><td>{{ r.percent }}%</td></tr>{% endfor %}
+</tbody></table></div>
+</div></body></html>

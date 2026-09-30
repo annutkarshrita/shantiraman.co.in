@@ -1,0 +1,7 @@
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Profile</title><style>
+body{margin:0;font-family:Arial;background:#f1f5f9}.wrap{max-width:700px;margin:auto;padding:15px}.box{background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 15px #0001}.back{display:inline-block;margin-bottom:12px;text-decoration:none;color:#17365d;font-weight:bold}table{width:100%;border-collapse:collapse}td{padding:10px;border-bottom:1px solid #e2e8f0}td:first-child{font-weight:bold;width:35%}
+</style></head><body><div class="wrap"><a class="back" href="{{ url_for('teacher_dashboard') }}">← Dashboard</a><div class="box"><h2>My Profile</h2><table>
+<tr><td>Name</td><td>{{ teacher_name }}</td></tr><tr><td>Designation</td><td>{{ designation }}</td></tr><tr><td>Role</td><td>{{ role }}</td></tr><tr><td>Email</td><td>{{ email }}</td></tr>
+{% if class_teacher %}<tr><td>Class</td><td>{{ class_teacher.class_name }}</td></tr><tr><td>Section</td><td>{{ class_teacher.section }}</td></tr><tr><td>Session</td><td>{{ class_teacher.session }}</td></tr>{% endif %}
+</table></div></div></body></html>
