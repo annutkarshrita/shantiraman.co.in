@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Shantiraman Dashboard</title>
+<title>Shantiraman ERP Dashboard</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#eef3f8;color:#222}
@@ -26,8 +26,8 @@ body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#ee
 <body>
 
 <div class="top">
-    <h2>Shantiraman</h2>
-    <div>Mobile Dashboard</div>
+    <h2>Shantiraman ERP</h2>
+    <div>Mobile ERP Dashboard</div>
     <div class="school">{{ school_name }}</div>
 </div>
 
@@ -41,12 +41,15 @@ body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#ee
 
     <div class="menu-title">मुख्य मेनू</div>
 
+    {% set role_norm = (role or '')|lower|replace(' ', '')|replace('_', '') %}
+
     <div class="menu">
         <button class="card" onclick="location.href='{{ url_for("exam_marks") }}'">
             <span class="icon">📝</span>
             Exam / Marks
         </button>
 
+        {% if role_norm in ['classteacher', 'admin', 'administrator', 'superadmin'] %}
         <button class="card" onclick="location.href='{{ url_for("my_students") }}'">
             <span class="icon">👨‍🎓</span>
             My Students
@@ -61,16 +64,19 @@ body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#ee
             <span class="icon">📊</span>
             My Result
         </button>
+        {% endif %}
 
         <button class="card" onclick="location.href='{{ url_for("my_profile") }}'">
             <span class="icon">👤</span>
             My Profile
         </button>
 
+        {% if role_norm in ['classteacher', 'admin', 'administrator', 'superadmin'] %}
         <button class="card" onclick="location.href='{{ url_for("my_fee") }}'">
             <span class="icon">💰</span>
             My Fee
         </button>
+        {% endif %}
     </div>
 
     <button class="logout" onclick="location.href='{{ url_for("logout") }}'">
