@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shantiraman - Smart School ERP Solutions</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; scroll-behavior: smooth; background: #f9f9f9; }
+        
+        /* Dark Header fix */
+        header { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 15px 5%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+         }
+
+        .logo-container { display: flex; align-items: center; }
+        
+        /* Logo Circle Fit - Premium look */
+           .logo-img { 
+        width: 55px;          /* Size bada kar diya */
+        height: 55px;         /* Height bhi badha di */
+        object-fit: contain;  /* 'contain' hi rakhein taaki logo ka design na kate */
+        border-radius: 50%;   /* Poora gola (circle) banane ke liye 50% zaroori hai */
+        background: white; 
+        padding: 2px;         /* Bahut halki padding taaki design kinaro se na takraye */
+        border: 2px solid #ecf0f1;
+        box-shadow: 0 0 12px rgba(0,0,0,0.3);
+        display: block;
+        transition: 0.3s;     /* Smooth look ke liye */
+    }
+
+/* Hover karne par halka sa aur bada dikhega */
+.logo-img:hover {
+    transform: scale(1.05);
+}
+        .logo-text { font-size: 1.6rem; font-weight: bold; margin-left: 15px; color: #ecf0f1; letter-spacing: 1px; }
+
+        nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
+        nav a:hover { color: #e74c3c; }
+
+        /* Gallery Grid Styling */
+        .gallery-container { padding: 40px 5%; text-align: center; }
+        .gallery-container h1 { color: #2c3e50; margin-bottom: 10px; font-size: 2.2rem; }
+        
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 25px; 
+            margin-top: 30px; 
+        }
+
+        .gallery-item { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            text-decoration: none; 
+            display: block;
+            border: 1px solid #eee;
+        }
+        
+        .gallery-item:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #e74c3c;
+        }
+
+        .img-container { overflow: hidden; border-radius: 10px; height: 160px; background: #f9f9f9; }
+
+        .gallery-item img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; /* Screenshots ke liye contain best hai taaki wo na kat-te */
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img { transform: scale(1.1); }
+
+        .gallery-item p { 
+            margin: 15px 0 5px 0; 
+            font-size: 1rem; 
+            color: #2c3e50; 
+            font-weight: 600; 
+        }
+
+        footer { background: #2c3e50; color: white; text-align: center; padding: 25px; margin-top: 60px; }
+
+        /* Mobile Responsive Header */
+        @media (max-width: 768px) {
+            header { flex-direction: column; text-align: center; }
+            nav { margin-top: 15px; }
+            .logo-container { flex-direction: column; }
+            .logo-text { margin-left: 0; margin-top: 10px; font-size: 1.3rem; }
+            .gallery-container h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo-container">
+        <img src="Shantiramanlogo.png" alt="Shantiraman Logo" class="logo-img" onerror="this.src='images/Shantiramanlogo.png'">
+        <span class="logo-text">SHANTIRAMAN</span>
+    </a>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="index.html#contact">Contact</a>
+    </nav>
+</header>
+
+<section class="gallery-container">
+    <h1>Software Glimpses & Events</h1>
+    <p>Humare ERP ke powerful features aur shaikshik gatividhiyan</p>
+
+    <div class="gallery-grid">
+        <a href="images/Admission%20Form.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Admission%20Form.png" alt="Admission Form"></div>
+            <p>Student Admission Form</p>
+        </a>
+
+        <a href="images/Attendence.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Attendence.png" alt="Attendance"></div>
+            <p>Smart Attendance System</p>
+        </a>
+
+        <a href="images/Softwere%20Setup.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Softwere%20Setup.png" alt="Software Setup"></div>
+            <p>ERP Software Setup</p>
+        </a>
+
+        <a href="images/Empoloyee%20Master.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Empoloyee%20Master.png" alt="Employee Master"></div>
+            <p>Staff & Employee Master</p>
+        </a>
+
+        <a href="images/Exam.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Exam.png" alt="Exam"></div>
+            <p>Examination Management</p>
+        </a>
+
+        <a href="images/Fee%20Receipt.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Fee%20Receipt.png" alt="Fee Receipt"></div>
+            <p>Fee Receipt & Accounting</p>
+        </a>
+
+        <a href="images/I%20Card.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/I%20Card.png" alt="I Card"></div>
+            <p>I-Card Generator</p>
+        </a>
+
+        <a href="images/Menu.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Menu.png" alt="Menu"></div>
+            <p>Main Dashboard Menu</p>
+        </a>
+
+        <a href="images/Student%20Master.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Student%20Master.png" alt="Student Master"></div>
+            <p>Student Master Data</p>
+        </a>
+
+        <a href="images/Student%20Pramotain.png" target="_blank" class="gallery-item">
+            <div class="img-container"><img src="images/Student%20Pramotain.png" alt="Student Promotion"></div>
+            <p>Student Class Promotion</p>
+        </a>
+
+     </div>
+</section>
+
+<footer>
+    <p>&copy; 2026 Shantiraman Software Solutions. All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>
