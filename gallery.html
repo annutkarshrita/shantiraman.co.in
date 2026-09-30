@@ -1,185 +1,204 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shantiraman - Smart School ERP Solutions</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; scroll-behavior: smooth; background: #f9f9f9; }
-        
-        /* Dark Header fix */
-        header { 
-            background: #2c3e50; 
-            color: white; 
-            padding: 15px 5%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-         }
-
-        .logo-container { display: flex; align-items: center; }
-        
-        /* Logo Circle Fit - Premium look */
-           .logo-img { 
-        width: 55px;          /* Size bada kar diya */
-        height: 55px;         /* Height bhi badha di */
-        object-fit: contain;  /* 'contain' hi rakhein taaki logo ka design na kate */
-        border-radius: 50%;   /* Poora gola (circle) banane ke liye 50% zaroori hai */
-        background: white; 
-        padding: 2px;         /* Bahut halki padding taaki design kinaro se na takraye */
-        border: 2px solid #ecf0f1;
-        box-shadow: 0 0 12px rgba(0,0,0,0.3);
-        display: block;
-        transition: 0.3s;     /* Smooth look ke liye */
-    }
-
-/* Hover karne par halka sa aur bada dikhega */
-.logo-img:hover {
-    transform: scale(1.05);
-}
-        .logo-text { font-size: 1.6rem; font-weight: bold; margin-left: 15px; color: #ecf0f1; letter-spacing: 1px; }
-
-        nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; transition: 0.3s; }
-        nav a:hover { color: #e74c3c; }
-
-        /* Gallery Grid Styling */
-        .gallery-container { padding: 40px 5%; text-align: center; }
-        .gallery-container h1 { color: #2c3e50; margin-bottom: 10px; font-size: 2.2rem; }
-        
-        .gallery-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: 25px; 
-            margin-top: 30px; 
-        }
-
-        .gallery-item { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            text-decoration: none; 
-            display: block;
-            border: 1px solid #eee;
-        }
-        
-        .gallery-item:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border-color: #e74c3c;
-        }
-
-        .img-container { overflow: hidden; border-radius: 10px; height: 160px; background: #f9f9f9; }
-
-        .gallery-item img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; /* Screenshots ke liye contain best hai taaki wo na kat-te */
-            transition: transform 0.5s ease;
-        }
-
-        .gallery-item:hover img { transform: scale(1.1); }
-
-        .gallery-item p { 
-            margin: 15px 0 5px 0; 
-            font-size: 1rem; 
-            color: #2c3e50; 
-            font-weight: 600; 
-        }
-
-        footer { background: #2c3e50; color: white; text-align: center; padding: 25px; margin-top: 60px; }
-
-        /* Mobile Responsive Header */
-        @media (max-width: 768px) {
-            header { flex-direction: column; text-align: center; }
-            nav { margin-top: 15px; }
-            .logo-container { flex-direction: column; }
-            .logo-text { margin-left: 0; margin-top: 10px; font-size: 1.3rem; }
-            .gallery-container h1 { font-size: 1.8rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Shantiraman ERP - Software Gallery">
+<title>Shantiraman ERP - Gallery</title>
+<style>
+:root{--navy:#173b6d;--blue:#2f78c4;--orange:#f28b30;--green:#198754;--purple:#6f42c1;--red:#dc3545;--teal:#0f8b8d;--light:#f4f7fb;--white:#fff;--text:#263447;--muted:#6b7788;--border:#e4eaf1;--shadow:0 10px 28px rgba(22,53,89,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Segoe UI",Tahoma,Arial,"Noto Sans Devanagari",sans-serif;color:var(--text);background:var(--light);line-height:1.6}a{text-decoration:none}img{display:block;max-width:100%}
+header{position:sticky;top:0;z-index:1000;background:linear-gradient(135deg,#173b6d,#285f9d);color:white;padding:12px 5%;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.header-inner{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo-container{display:flex;align-items:center;color:white}.logo-img{width:55px;height:55px;object-fit:contain;border-radius:50%;background:white;padding:2px;border:2px solid rgba(255,255,255,.85);box-shadow:0 0 14px rgba(0,0,0,.28);transition:transform .25s ease}.logo-img:hover{transform:scale(1.05)}.logo-text{margin-left:14px;font-size:1.55rem;font-weight:700;letter-spacing:1px}
+nav{display:flex;align-items:center;gap:10px}nav a{color:white;font-size:14px;font-weight:600;padding:9px 12px;border-radius:9px;transition:.25s ease}nav a:hover{background:rgba(255,255,255,.12);color:#ffd9ae}.login-btn{background:var(--orange);box-shadow:0 6px 16px rgba(242,139,48,.28)}.login-btn:hover{background:#db7117;color:white}
+.hero{background:radial-gradient(circle at 85% 15%,rgba(111,66,193,.17),transparent 25%),radial-gradient(circle at 12% 10%,rgba(25,135,84,.13),transparent 24%),linear-gradient(135deg,#fff,#edf4ff);padding:58px 5% 46px;text-align:center}.hero-inner{max-width:920px;margin:auto}.eyebrow{display:inline-block;background:#fff4e8;color:#b75c12;border:1px solid #ffd8af;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:12px}.hero h1{margin:0 0 12px;color:var(--navy);font-size:clamp(2rem,4vw,3rem)}.hero p{margin:0 auto;max-width:760px;color:var(--muted);font-size:16px}
+.gallery-container{max-width:1220px;margin:auto;padding:40px 5% 70px}.gallery-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}.gallery-item{background:white;border-radius:17px;padding:11px;border:1px solid var(--border);box-shadow:var(--shadow);display:block;transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;overflow:hidden}.gallery-item:hover{transform:translateY(-7px);box-shadow:0 16px 34px rgba(22,53,89,.16)}.gallery-item:nth-child(4n+1):hover{border-color:#ffcc9a}.gallery-item:nth-child(4n+2):hover{border-color:#b8dfca}.gallery-item:nth-child(4n+3):hover{border-color:#cfc0ec}.gallery-item:nth-child(4n):hover{border-color:#b9d6f4}
+.img-container{overflow:hidden;border-radius:12px;height:175px;background:#f7f9fc;border:1px solid #edf1f5}.img-container img{width:100%;height:100%;object-fit:contain;transition:transform .45s ease}.gallery-item:hover .img-container img{transform:scale(1.05)}.gallery-item p{margin:14px 5px 5px;min-height:42px;text-align:center;font-size:15px;font-weight:700;color:var(--navy)}
+.color-bar{height:4px;border-radius:999px;margin:9px 5px 0}.orange .color-bar{background:var(--orange)}.green .color-bar{background:var(--green)}.purple .color-bar{background:var(--purple)}.blue .color-bar{background:var(--blue)}.red .color-bar{background:var(--red)}.teal .color-bar{background:var(--teal)}
+.cta{max-width:900px;margin:0 auto 10px;background:linear-gradient(135deg,#173b6d,#265d99);color:white;border-radius:22px;padding:35px 25px;text-align:center;box-shadow:0 16px 38px rgba(23,59,109,.18)}.cta h2{margin:0 0 8px;font-size:28px}.cta p{margin:0 auto 19px;color:#d8e3f2;font-size:14px}.cta a{display:inline-flex;align-items:center;justify-content:center;background:var(--orange);color:white;padding:11px 18px;border-radius:10px;font-weight:700;font-size:14px}.cta a:hover{background:#dc7318}
+footer{background:#0e2747;color:#dce6f2;text-align:center;padding:24px 5%;margin-top:55px}footer p{margin:0;font-size:13px}
+@media(max-width:1000px){.gallery-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){header{padding:12px 4%}.header-inner{flex-direction:column;gap:12px}.logo-container{flex-direction:column;text-align:center}.logo-text{margin-left:0;margin-top:8px;font-size:1.3rem}nav{flex-wrap:wrap;justify-content:center;gap:5px}nav a{font-size:12px;padding:8px 10px}.hero{padding:42px 5% 35px}.hero p{font-size:14px}.gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.img-container{height:145px}.gallery-item p{font-size:13px}}
+@media(max-width:480px){.gallery-grid{grid-template-columns:1fr}.img-container{height:185px}}
+</style>
 </head>
 <body>
 
 <header>
-    <a href="index.html" class="logo-container">
-        <img src="Shantiramanlogo.png" alt="Shantiraman Logo" class="logo-img" onerror="this.src='images/Shantiramanlogo.png'">
-        <span class="logo-text">SHANTIRAMAN</span>
-    </a>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="index.html#features">Features</a>
-        <a href="gallery.html">Gallery</a>
-        <a href="index.html#contact">Contact</a>
-    </nav>
+<div class="header-inner">
+<a href="index.html" class="logo-container">
+<img src="Shantiramanlogo.png" alt="Shantiraman Logo" class="logo-img" onerror="this.src='images/Shantiramanlogo.png'">
+<span class="logo-text">SHANTIRAMAN ERP</span>
+</a>
+<nav>
+<a href="index.html">Home</a>
+<a href="index.html#features">Features</a>
+<a href="gallery.html">Gallery</a>
+<a href="index.html#contact">Contact</a>
+<a href="https://login.shantiraman.co.in" target="_blank" rel="noopener" class="login-btn">🔐 ERP Login</a>
+</nav>
+</div>
 </header>
 
+<section class="hero">
+<div class="hero-inner">
+<div class="eyebrow">Shantiraman ERP • Software Gallery</div>
+<h1>Software Glimpses &amp; Features</h1>
+<p>Shantiraman ERP के विभिन्न modules और screens का preview देखें। किसी screenshot पर click करके उसे बड़े आकार में भी देखा जा सकता है।</p>
+</div>
+</section>
+
+
+<section class="gallery-container" style="padding-bottom:0;">
+    <div class="slideshow-wrap">
+        <div class="slideshow" id="erpSlideshow">
+            <div class="slide active">
+                <img src="images/Admission%20Form.png" alt="Admission Form">
+                <div class="slide-caption">Admission Form</div>
+            </div>
+            <div class="slide">
+                <img src="images/Attendence.png" alt="Student Attendance System">
+                <div class="slide-caption">Student Attendance System</div>
+            </div>
+            <div class="slide">
+                <img src="images/Softwere%20Setup.png" alt="Software Setup">
+                <div class="slide-caption">Software Setup</div>
+            </div>
+            <div class="slide">
+                <img src="images/Empoloyee%20Master.png" alt="Employee Management">
+                <div class="slide-caption">Employee Management</div>
+            </div>
+            <div class="slide">
+                <img src="images/Exam.png" alt="Examination and Marks">
+                <div class="slide-caption">Examination &amp; Marks</div>
+            </div>
+            <div class="slide">
+                <img src="images/Fee%20Receipt.png" alt="Fee Management and Receipt">
+                <div class="slide-caption">Fee Management &amp; Receipt</div>
+            </div>
+            <div class="slide">
+                <img src="images/I%20Card.png" alt="Identity Card">
+                <div class="slide-caption">Identity Card</div>
+            </div>
+            <div class="slide">
+                <img src="images/Menu.png" alt="Complete ERP Menu">
+                <div class="slide-caption">Complete ERP Menu</div>
+            </div>
+            <div class="slide">
+                <img src="images/Student%20Master.png" alt="Student Master">
+                <div class="slide-caption">Student Master</div>
+            </div>
+            <div class="slide">
+                <img src="images/Student%20Pramotain.png" alt="Student Promotion">
+                <div class="slide-caption">Student Promotion</div>
+            </div>
+        </div>
+
+        <div class="slide-dots" id="slideDots">
+            <button class="slide-dot active" type="button" aria-label="Slide 1" onclick="showSlide(0)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 2" onclick="showSlide(1)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 3" onclick="showSlide(2)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 4" onclick="showSlide(3)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 5" onclick="showSlide(4)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 6" onclick="showSlide(5)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 7" onclick="showSlide(6)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 8" onclick="showSlide(7)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 9" onclick="showSlide(8)"></button>
+            <button class="slide-dot" type="button" aria-label="Slide 10" onclick="showSlide(9)"></button>
+        </div>
+    </div>
+</section>
+
 <section class="gallery-container">
-    <h1>Software Glimpses & Events</h1>
-    <p>Humare ERP ke powerful features aur shaikshik gatividhiyan</p>
+<div class="gallery-grid">
 
-    <div class="gallery-grid">
-        <a href="images/Admission%20Form.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Admission%20Form.png" alt="Admission Form"></div>
-            <p>Student Admission Form</p>
-        </a>
+<a href="images/Admission%20Form.png" target="_blank" class="gallery-item orange">
+<div class="img-container"><img src="images/Admission%20Form.png" alt="Admission Form"></div><div class="color-bar"></div><p>Admission Form</p>
+</a>
 
-        <a href="images/Attendence.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Attendence.png" alt="Attendance"></div>
-            <p>Smart Attendance System</p>
-        </a>
+<a href="images/Attendence.png" target="_blank" class="gallery-item green">
+<div class="img-container"><img src="images/Attendence.png" alt="Attendance"></div><div class="color-bar"></div><p>Student Attendance System</p>
+</a>
 
-        <a href="images/Softwere%20Setup.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Softwere%20Setup.png" alt="Software Setup"></div>
-            <p>ERP Software Setup</p>
-        </a>
+<a href="images/Softwere%20Setup.png" target="_blank" class="gallery-item purple">
+<div class="img-container"><img src="images/Softwere%20Setup.png" alt="Software Setup"></div><div class="color-bar"></div><p>Manage Your Software Setup</p>
+</a>
 
-        <a href="images/Empoloyee%20Master.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Empoloyee%20Master.png" alt="Employee Master"></div>
-            <p>Staff & Employee Master</p>
-        </a>
+<a href="images/Empoloyee%20Master.png" target="_blank" class="gallery-item blue">
+<div class="img-container"><img src="images/Empoloyee%20Master.png" alt="Employee Master"></div><div class="color-bar"></div><p>Employee Management</p>
+</a>
 
-        <a href="images/Exam.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Exam.png" alt="Exam"></div>
-            <p>Examination Management</p>
-        </a>
+<a href="images/Exam.png" target="_blank" class="gallery-item red">
+<div class="img-container"><img src="images/Exam.png" alt="Examination"></div><div class="color-bar"></div><p>Examination &amp; Marks</p>
+</a>
 
-        <a href="images/Fee%20Receipt.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Fee%20Receipt.png" alt="Fee Receipt"></div>
-            <p>Fee Receipt & Accounting</p>
-        </a>
+<a href="images/Fee%20Receipt.png" target="_blank" class="gallery-item orange">
+<div class="img-container"><img src="images/Fee%20Receipt.png" alt="Fee Receipt"></div><div class="color-bar"></div><p>Fee Management &amp; Receipt</p>
+</a>
 
-        <a href="images/I%20Card.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/I%20Card.png" alt="I Card"></div>
-            <p>I-Card Generator</p>
-        </a>
+<a href="images/I%20Card.png" target="_blank" class="gallery-item purple">
+<div class="img-container"><img src="images/I%20Card.png" alt="Identity Card"></div><div class="color-bar"></div><p>Identity Card</p>
+</a>
 
-        <a href="images/Menu.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Menu.png" alt="Menu"></div>
-            <p>Main Dashboard Menu</p>
-        </a>
+<a href="images/Menu.png" target="_blank" class="gallery-item teal">
+<div class="img-container"><img src="images/Menu.png" alt="ERP Menu"></div><div class="color-bar"></div><p>Complete ERP Menu</p>
+</a>
 
-        <a href="images/Student%20Master.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Student%20Master.png" alt="Student Master"></div>
-            <p>Student Master Data</p>
-        </a>
+<a href="images/Student%20Master.png" target="_blank" class="gallery-item blue">
+<div class="img-container"><img src="images/Student%20Master.png" alt="Student Master"></div><div class="color-bar"></div><p>Student Master</p>
+</a>
 
-        <a href="images/Student%20Pramotain.png" target="_blank" class="gallery-item">
-            <div class="img-container"><img src="images/Student%20Pramotain.png" alt="Student Promotion"></div>
-            <p>Student Class Promotion</p>
-        </a>
+<a href="images/Student%20Pramotain.png" target="_blank" class="gallery-item green">
+<div class="img-container"><img src="images/Student%20Pramotain.png" alt="Student Promotion"></div><div class="color-bar"></div><p>Student Promotion</p>
+</a>
 
-     </div>
+</div>
+
+<div class="cta" style="margin-top:45px;">
+<h2>Shantiraman ERP को और करीब से देखें</h2>
+<p>School management software के बारे में जानकारी या ERP demo के लिए संपर्क करें।</p>
+<a href="https://login.shantiraman.co.in" target="_blank" rel="noopener">🔐 ERP Login</a>
+</div>
 </section>
 
 <footer>
-    <p>&copy; 2026 Shantiraman Software Solutions. All Rights Reserved.</p>
+<p>&copy; 2026 Shantiraman Software Solutions. All Rights Reserved.</p>
 </footer>
+
+
+<script>
+let currentSlide = 0;
+let slideTimer;
+
+function showSlide(index) {
+    const slides = document.querySelectorAll("#erpSlideshow .slide");
+    const dots = document.querySelectorAll("#slideDots .slide-dot");
+
+    if (!slides.length) return;
+
+    currentSlide = (index + slides.length) % slides.length;
+
+    slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === currentSlide);
+    });
+
+    dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === currentSlide);
+    });
+}
+
+function nextSlide() {
+    showSlide(currentSlide + 1);
+}
+
+function startSlideshow() {
+    clearInterval(slideTimer);
+    slideTimer = setInterval(nextSlide, 2800);
+}
+
+document.addEventListener("DOMContentLoaded", startSlideshow);
+</script>
 
 </body>
 </html>
