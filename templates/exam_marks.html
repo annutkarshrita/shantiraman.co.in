@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ school_name }} - Exam Marks</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fa;color:#222;padding:15px}
+.container{max-width:1100px;margin:auto;background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 18px rgba(0,0,0,.10)}
+h2{margin:0 0 5px;color:#29457c} .session{color:#666;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field label{display:block;font-weight:bold;margin-bottom:6px}
+select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;background:#fff}
+button{border:0;border-radius:8px;padding:11px 18px;background:#29457c;color:#fff;font-weight:bold;cursor:pointer}
+button:hover{background:#1f3765}.save{margin-top:15px;width:100%;font-size:16px}
+.msg{padding:11px;border-radius:8px;margin-bottom:14px;line-height:1.5}.error{background:#fde8e8;color:#b91c1c}.success{background:#e8f7ed;color:#166534}
+table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#eef2f7}
+.marks{max-width:130px}.info{margin-top:14px;padding:10px;background:#f5f7fb;border-radius:8px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.container{padding:14px}body{padding:8px}table{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Exam Marks Entry</h2>
+<div class="session">{{ school_name }} | Active Session: <b>{{ session_name }}</b></div>
+
+{% if error %}<div class="msg error">{{ error }}</div>{% endif %}
+{% if success %}<div class="msg success">{{ success }}</div>{% endif %}
+
+<form method="GET" id="filterForm">
+<div class="grid">
+<div class="field">
+<label>Exam</label>
+<select name="exam" onchange="this.form.submit()" required>
+<option value="">-- Exam Select करें --</option>
+{% for e in exams %}
+<option value="{{ e.value }}" {% if selected_exam==e.value %}selected{% endif %}>{{ e.value }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="field">
+<label>Class</label>
+<select name="class_name" onchange="this.form.submit()" {% if not selected_exam %}disabled{% endif %} required>
+<option value="">-- Class Select करें --</option>
+{% for c in classes %}
+<option value="{{ c }}" {% if selected_class==c %}selected{% endif %}>{{ c }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="field">
+<label>Section</label>
+<select name="section" onchange="this.form.submit()" {% if not selected_class %}disabled{% endif %} required>
+<option value="">-- Section Select करें --</option>
+{% for s in sections %}
+<option value="{{ s }}" {% if selected_section==s %}selected{% endif %}>{{ s }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="field">
+<label>Subject</label>
+<select name="subject" onchange="this.form.submit()" {% if not selected_section %}disabled{% endif %} required>
+<option value="">-- Subject Select करें --</option>
+{% for x in subjects %}
+<option value="{{ x.subject }}" {% if selected_subject==x.subject %}selected{% endif %}>{{ x.subject }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="field">
+<label>SubSubject</label>
+<select name="subsubject" onchange="this.form.submit()" {% if not selected_subject %}disabled{% endif %} required>
+<option value="">-- SubSubject Select करें --</option>
+{% for s in subsubjects %}
+<option value="{{ s }}" {% if selected_subsubject==s %}selected{% endif %}>{{ s }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="field">
+<label>Max Marks</label>
+<input type="text" value="{{ max_marks }}" readonly>
+</div>
+</div>
+
+{% if selected_subject and selected_subsubject %}
+<button type="submit">Student List Load करें</button>
+{% endif %}
+</form>
+
+{% if students and max_marks %}
+<div class="info">Class: <b>{{ selected_class }}</b> &nbsp; Section: <b>{{ selected_section }}</b> &nbsp; Subject: <b>{{ selected_subject }}</b> &nbsp; SubSubject: <b>{{ selected_subsubject }}</b> &nbsp; Max Marks: <b>{{ max_marks }}</b></div>
+<form method="POST">
+<input type="hidden" name="exam" value="{{ selected_exam }}">
+<input type="hidden" name="class_name" value="{{ selected_class }}">
+<input type="hidden" name="section" value="{{ selected_section }}">
+<input type="hidden" name="subject" value="{{ selected_subject }}">
+<input type="hidden" name="subsubject" value="{{ selected_subsubject }}">
+<input type="hidden" name="action" value="save">
+<table>
+<thead><tr><th>Sr No</th><th>Student Name</th><th>Obtained Marks (0 - {{ max_marks }})</th></tr></thead>
+<tbody>
+{% for st in students %}
+<tr>
+<td>{{ st.srno }}</td>
+<td>{{ st.name }}</td>
+<td><input class="marks" type="number" step="0.01" min="0" max="{{ max_marks }}" name="marks_{{ st.id }}" value="{{ st.obtmarks }}"></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<button class="save" type="submit">Marks Save / Update करें</button>
+</form>
+{% elif selected_subject and selected_subsubject and not error %}
+<div class="msg error">इस Class/Section में कोई Active Student नहीं मिला।</div>
+{% endif %}
+</div>
+</body>
+</html>
