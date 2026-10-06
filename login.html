@@ -6,14 +6,16 @@
 <title>Login - Shantiraman ERP</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#2c3e50,#3498db);display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card{width:100%;max-width:430px;background:#fff;border-radius:18px;padding:32px;box-shadow:0 12px 35px rgba(0,0,0,.28);text-align:center}
+body{margin:0;min-height:100vh;font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+background:linear-gradient(135deg,#2c3e50,#3498db);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{width:100%;max-width:430px;background:#fff;border-radius:18px;padding:32px;
+box-shadow:0 12px 35px rgba(0,0,0,.28);text-align:center}
 .logo{width:90px;height:90px;object-fit:cover;border-radius:50%;background:#fff;margin-bottom:12px}
 h1{margin:0 0 6px;color:#2c3e50;font-size:28px}
 .school-name{margin:0 0 5px;color:#111;font-weight:700;font-size:16px}
 .subtitle{margin:0 0 25px;color:#666}
 label{display:block;text-align:left;font-weight:600;margin-bottom:8px;color:#333}
-input{width:100%;padding:13px;border:1px solid #ccc;border-radius:8px;font-size:15px;margin-bottom:18px;background:#fff}
+select,input{width:100%;padding:13px;border:1px solid #ccc;border-radius:8px;font-size:15px;margin-bottom:18px;background:#fff}
 button{width:100%;border:0;border-radius:8px;padding:13px;background:#193b68;color:#fff;font-size:16px;font-weight:bold;cursor:pointer}
 button:hover{background:#142f54}
 .back{display:inline-block;margin-top:18px;color:#193b68;text-decoration:none;font-weight:600}
@@ -26,13 +28,19 @@ button:hover{background:#142f54}
 </head>
 <body>
 <div class="login-card">
-<img src="/Shatiramanlogo.jpg" alt="Shantiraman Logo" class="logo" onerror="this.style.display='none'">
+<img src="/Shatiramanlogo.jpg" alt="Shantiraman Logo" class="logo"
+     onerror="this.style.display='none'">
+
 <h1>Shantiraman ERP</h1>
 <p class="school-name">{{ school_name or session.get('school_name','School ERP') }}</p>
 <p class="subtitle">Mobile ERP Login</p>
 
-{% if error %}<div class="msg error">{{ error }}</div>{% endif %}
-{% if reset_success %}<div class="msg success">{{ reset_success }}</div>{% endif %}
+{% if error %}
+<div class="msg error">{{ error }}</div>
+{% endif %}
+{% if reset_success %}
+<div class="msg success">{{ reset_success }}</div>
+{% endif %}
 
 <form method="POST" action="/login">
     <input type="hidden" name="role" value="{{ request.args.get('role', session.get('login_role','')) }}">
@@ -48,6 +56,7 @@ button:hover{background:#142f54}
 
 <a href="/forgot-password" class="back">Forgot Password?</a><br>
 <a href="/select-school" class="back">← School बदलें</a>
+
 <p class="note">Shantiraman ERP Mobile</p>
 </div>
 </body>
