@@ -797,8 +797,7 @@ function choosePortal(type){
   }
 }
 function chooseSchool(code){
-  window.selectedSchool=code;
-  showLoginStep(3);
+  window.location.assign("https://login.shantiraman.co.in/login?school="+encodeURIComponent(code));
 }
 function goRole(role){
   const school=window.selectedSchool || "ramraji";
@@ -837,7 +836,7 @@ document.addEventListener("keydown",function(e){
           <span class="ico">👨‍👩‍👧</span>Guardian
         </div>
       </div>
-      <div class="login-note">School login में पहले School और फिर आपका Role चुना जाएगा।</div>
+      <div class="login-note">School चुनने के बाद Login पेज पर अपना Role चुनें।</div>
     </div>
 
     <div id="loginStep2" class="login-step">
@@ -849,27 +848,8 @@ document.addEventListener("keydown",function(e){
       </div>
       <button class="login-back" onclick="showLoginStep(1)">← वापस जाएँ</button>
     </div>
-
-    <div id="loginStep3" class="login-step">
-      <div class="login-step-title">अपना Role चुनें</div>
-      <div class="role-options">
-        <div class="role-option" onclick="goRole('classteacher')">
-          <span class="role-icon">👩‍🏫</span>
-          <span>Class Teacher</span>
-        </div>
-        <div class="role-option" onclick="goRole('teacher')">
-          <span class="role-icon">📚</span>
-          <span>Teacher</span>
-        </div>
-        <div class="role-option" onclick="goRole('admin')">
-          <span class="role-icon">⚙️</span>
-          <span>Admin</span>
-        </div>
-      </div>
-      <button class="login-back" onclick="showLoginStep(2)">← School बदलें</button>
     </div>
   </div>
-</div>
 
 </body>
 </html>
