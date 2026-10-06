@@ -791,13 +791,15 @@ function chooseSchool(code){
 }
 function goRole(role){
   const school=window.selectedSchool || "ramraji";
-  window.location.href="https://login.shantiraman.co.in/login?school="+encodeURIComponent(school)+"&role="+encodeURIComponent(role);
+  const url="https://login.shantiraman.co.in/login?school="+encodeURIComponent(school)+"&role="+encodeURIComponent(role);
+  window.location.assign(url);
 }
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape") closeLogin();
 });
 
-(function(){const x=document.querySelectorAll(".tv-slide");if(!x.length)return;let i=0;setInterval(function(){x[i].classList.remove("active");i=(i+1)%x.length;x[i].classList.add("active")},3500)})();\n</script>
+(function(){const x=document.querySelectorAll(".tv-slide");if(!x.length)return;let i=0;setInterval(function(){x[i].classList.remove("active");i=(i+1)%x.length;x[i].classList.add("active")},3500)})();
+</script>
 
 
 <!-- LOGIN FLOW MODAL -->
@@ -831,7 +833,7 @@ document.addEventListener("keydown",function(e){
       <div class="login-step-title">School चुनें</div>
       <div class="login-options">
         <div class="login-option" onclick="chooseSchool('ramraji')">
-          <span class="ico">🏫</span>Ram Raji
+          <span class="ico">🏫</span><span>Ram Raji Saraswati Balika Vidya Mandir Inter College,<br>Shahganj, Sultanpur</span>
         </div>
       </div>
       <button class="login-back" onclick="showLoginStep(1)">← वापस जाएँ</button>
