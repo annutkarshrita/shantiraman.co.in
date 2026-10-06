@@ -371,6 +371,141 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
   .cta h2{font-size:28px}
   .footer{flex-direction:column;text-align:center}
 }
+
+/* LOGIN FLOW */
+.login-modal{
+  position:fixed;inset:0;z-index:5000;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(7,23,43,.62);backdrop-filter:blur(9px);
+}
+.login-modal.show{display:flex}
+.login-card{
+  width:min(540px,96vw);background:#fff;border-radius:28px;
+  padding:30px;box-shadow:0 30px 90px rgba(0,0,0,.25);
+  position:relative;animation:loginIn .22s ease;
+}
+@keyframes loginIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.login-close{
+  position:absolute;right:18px;top:16px;border:0;background:#eef4fb;
+  color:#344f68;width:38px;height:38px;border-radius:50%;font-size:21px;cursor:pointer;
+}
+.login-brand{text-align:center}
+.login-brand img{width:64px;height:64px;object-fit:contain;margin:0 auto 10px}
+.login-brand h2{margin:0;color:var(--navy);font-size:27px}
+.login-brand p{margin:7px 0 24px;color:var(--muted);font-size:13px}
+.login-step{display:none}
+.login-step.active{display:block}
+.login-step-title{font-size:14px;font-weight:800;color:#334155;margin-bottom:12px}
+.login-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.login-option{
+  border:1px solid #dfe8f2;background:#fbfdff;border-radius:16px;
+  padding:18px 10px;text-align:center;cursor:pointer;font-weight:800;
+  color:var(--navy);transition:.18s;
+}
+.login-option:hover{border-color:var(--blue);background:#f2f7ff;transform:translateY(-2px)}
+.login-option .ico{font-size:28px;display:block;margin-bottom:8px}
+.role-options{display:grid;grid-template-columns:1fr;gap:11px}
+.role-option{
+  border:1px solid #dfe8f2;background:#fff;border-radius:15px;padding:15px 17px;
+  cursor:pointer;display:flex;align-items:center;gap:13px;font-weight:800;color:var(--navy);
+}
+.role-option:hover{border-color:var(--blue);background:#f4f8ff}
+.role-icon{
+  width:42px;height:42px;border-radius:12px;background:#edf5ff;
+  display:flex;align-items:center;justify-content:center;font-size:21px;
+}
+.login-back{
+  border:0;background:none;color:var(--blue);font-weight:800;cursor:pointer;
+  margin-top:18px;padding:5px 0;
+}
+.login-note{
+  margin-top:17px;padding:11px 13px;border-radius:12px;background:#f7f9fc;
+  color:var(--muted);font-size:11px;text-align:center;
+}
+@media(max-width:520px){
+  .login-card{padding:25px 18px;border-radius:22px}
+  .login-options{grid-template-columns:1fr}
+  .login-option{padding:14px}
+}
+
+
+/* ERP MODULE GRID */
+.modules-section{
+  background:linear-gradient(180deg,#f7faff 0%,#eef5fc 100%);
+}
+.erp-module-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+}
+.erp-card{
+  min-height:145px;
+  background:#fff;
+  border:1px solid #dce7f2;
+  border-radius:18px;
+  padding:20px 15px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  box-shadow:0 10px 28px rgba(14,39,71,.07);
+  transition:.22s ease;
+  cursor:default;
+}
+.erp-card:hover{
+  transform:translateY(-5px);
+  border-color:#8db8e5;
+  box-shadow:0 18px 38px rgba(14,39,71,.13);
+}
+.erp-icon{
+  width:52px;height:52px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#eaf4ff,#f5f9ff);
+  font-size:27px;margin-bottom:12px;
+}
+.erp-card strong{
+  color:#0b1f3a;font-size:15px;line-height:1.25;
+}
+.erp-card span{
+  color:#718096;font-size:11px;margin-top:6px;
+}
+.erp-link-card{cursor:pointer}
+.erp-link-card:hover .erp-icon{background:#e6f7ef}
+.coming-card{background:#f9fbfd}
+.coming-card .erp-icon{filter:grayscale(.15)}
+@media(max-width:1050px){
+  .erp-module-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:650px){
+  .erp-module-grid{grid-template-columns:repeat(2,1fr);gap:11px}
+  .erp-card{min-height:125px;padding:15px 8px}
+  .erp-card strong{font-size:13px}
+}
+@media(max-width:420px){
+  .erp-module-grid{grid-template-columns:1fr 1fr}
+}
+
+.tv-screen-slideshow{position:relative;height:330px;width:100%;overflow:hidden;border-radius:18px;background:#fff}.tv-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;opacity:0;transition:opacity .7s}.tv-slide.active{opacity:1}\n
+/* CLEAN MODERN REFINEMENTS */
+.tv-slogan{padding:34px 0 28px;text-align:center;background:#fff}
+.tv-slogan .slogan-line{width:76px;height:4px;border-radius:10px;margin:0 auto 15px;background:linear-gradient(90deg,#1769aa,#38a3d1)}
+.tv-slogan h2{margin:0;color:#0b2a4a;font-size:28px}
+.tv-slogan p{margin:8px 0 0;color:#718096;font-size:14px}
+.social-section{padding:20px 0 55px;background:#f7faff}
+.social-box{border-radius:24px;background:linear-gradient(135deg,#0b2f52,#0f5f91);padding:30px 34px;display:flex;align-items:center;justify-content:space-between;gap:25px;box-shadow:0 18px 40px rgba(14,39,71,.12)}
+.social-box .kicker{color:#9fd9ff}
+.social-box h2{margin:5px 0 7px;color:#fff}
+.social-box p{margin:0;color:#dbeaf5;max-width:650px}
+.social-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.social-links a{display:flex;align-items:center;gap:7px;padding:11px 14px;border:1px solid rgba(255,255,255,.22);border-radius:13px;color:#fff;text-decoration:none;background:rgba(255,255,255,.09);font-weight:700;font-size:13px;transition:.2s}
+.social-links a:hover{transform:translateY(-2px);background:rgba(255,255,255,.16)}
+@media(max-width:760px){
+  .tv-slogan h2{font-size:21px}
+  .social-box{padding:25px 20px;display:block}
+  .social-links{justify-content:flex-start;margin-top:18px}
+}
+
 </style>
 </head>
 
@@ -381,8 +516,9 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
     <a href="index.html" class="brand">
       <img src="Shantiramanlogo.png" alt="Shantiraman Logo">
       <div>
-        <strong>SHANTIRAMAN ERP</strong>
-        <small>Smart School Management Software</small>
+        <strong>SHANTIRAMAN</strong>
+	<small>Enterprise Resource Planning</small>
+	<small>Make Your School Smart</small>
       </div>
     </a>
 
@@ -391,7 +527,7 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
       <a href="#modules">Features</a>
       <a href="gallery.html">Gallery</a>
       <a href="#contact">Contact</a>
-      <a class="login" href="https://login.shantiraman.co.in" target="_blank" rel="noopener">🔐 ERP LOGIN</a>
+      <a class="login" href="#login" onclick="openLogin(event)">LOGIN</a>
     </nav>
 
     <button class="menu" onclick="toggleMenu()">☰</button>
@@ -403,7 +539,7 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
       <a href="#modules" onclick="closeMenu()">Features</a>
       <a href="gallery.html">Gallery</a>
       <a href="#contact" onclick="closeMenu()">Contact</a>
-      <a class="login" style="display:flex;justify-content:center;" href="https://login.shantiraman.co.in" target="_blank" rel="noopener">🔐 ERP LOGIN</a>
+      <a class="login" style="display:flex;justify-content:center;" href="#login" onclick="openLogin(event)">LOGIN</a>
     </div>
   </div>
 </header>
@@ -423,14 +559,20 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
       </div>
 
       <div class="actions">
-        <a href="https://login.shantiraman.co.in" class="btn btn-main" target="_blank" rel="noopener">🔐 ERP Login</a>
         <a href="gallery.html" class="btn btn-light">📸 Software Gallery</a>
         <a href="https://wa.me/919415469746" class="btn btn-light" target="_blank" rel="noopener">💬 Demo</a>
       </div>
     </div>
 
     <div class="dashboard">
-      <img src="images/Menu.png" alt="Shantiraman ERP Dashboard">
+      <div class="tv-screen-slideshow">
+<img class="tv-slide active" src="images/Menu.png" alt="ERP Dashboard">
+<img class="tv-slide" src="images/Admission%20Form.png" alt="Admission Form">
+<img class="tv-slide" src="images/Student%20Master.png" alt="Student Master">
+<img class="tv-slide" src="images/Fee%20Receipt.png" alt="Fee Management">
+<img class="tv-slide" src="images/Attendence.png" alt="Attendance">
+<img class="tv-slide" src="images/Exam.png" alt="Examination">
+</div>
       <div class="dashboard-bar">
         <div class="dashboard-item"><strong>Students</strong><span>Digital Records</span></div>
         <div class="dashboard-item"><strong>Fees</strong><span>Collection</span></div>
@@ -440,62 +582,50 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
   </div>
 </section>
 
+<section class="tv-slogan">
+  <div class="container">
+    <div class="slogan-line"></div>
+    <h2>Your School • Your Data • One Smart Platform</h2>
+    </div>
+</section>
+
 <section class="stat-strip">
   <div class="container stats">
-    <div class="stat"><strong>Student</strong><span>Master & Academic Records</span></div>
-    <div class="stat"><strong>Fees</strong><span>Collection & Receipt</span></div>
-    <div class="stat"><strong>Attendance</strong><span>Daily & Reports</span></div>
-    <div class="stat"><strong>Exam</strong><span>Marks & Result</span></div>
-  </div>
+    <div class="stat"><strong>तकनीक</strong><span> से सरल प्रबंधन, शिक्षा में बेहतर परिणाम</span></div>
+    </div>
 </section>
 
-<section id="modules" class="section">
+
+<section id="modules" class="section modules-section">
   <div class="container">
     <div class="head">
-      <div class="kicker">ERP Modules</div>
-      <h2>School के सभी जरूरी काम एक जगह</h2>
-      <p>एक साफ, आधुनिक और उपयोग में आसान ERP workflow के साथ school records को manage करें।</p>
+      <div class="kicker">Complete ERP</div>
+      <h2>School के सभी Modules एक जगह</h2>
+      <p>Shantiraman ERP के प्रमुख modules को एक modern और साफ interface में देखें।</p>
     </div>
 
-    <div class="modules">
-      <article class="module">
-        <div class="module-pic"><img src="images/Admission%20Form.png" alt="Admission"></div>
-        <h3>Admission & Student Master</h3>
-        <p>Admission से लेकर student academic information तक digital record management।</p>
-      </article>
+    <div class="erp-module-grid">
+      <div class="erp-card"><div class="erp-icon">📝</div><strong>Admission Form</strong><span>Admission management</span></div>
+      <div class="erp-card"><div class="erp-icon">🎓</div><strong>Student Master</strong><span>Student records</span></div>
+      <div class="erp-card"><div class="erp-icon">👨‍🏫</div><strong>Employee Master</strong><span>Staff management</span></div>
+      <div class="erp-card"><div class="erp-icon">💰</div><strong>Fee Management</strong><span>Fees & receipts</span></div>
+      <div class="erp-card"><div class="erp-icon">📅</div><strong>Attendance</strong><span>Daily attendance</span></div>
 
-      <article class="module">
-        <div class="module-pic"><img src="images/Fee%20Receipt.png" alt="Fee"></div>
-        <h3>Fee Management</h3>
-        <p>Fee collection, receipt और monthly fee records को व्यवस्थित रखें।</p>
-      </article>
+      <div class="erp-card"><div class="erp-icon">📚</div><strong>Examination</strong><span>Marks & results</span></div>
+      <div class="erp-card"><div class="erp-icon">🚌</div><strong>Transport</strong><span>Routes & vehicles</span></div>
+      <div class="erp-card"><div class="erp-icon">🏦</div><strong>Accounts</strong><span>School accounts</span></div>
+      <div class="erp-card"><div class="erp-icon">📄</div><strong>Transfer Certificate</strong><span>TC management</span></div>
+      <div class="erp-card"><div class="erp-icon">⚙️</div><strong>Master Setup</strong><span>System setup</span></div>
 
-      <article class="module">
-        <div class="module-pic"><img src="images/Attendence.png" alt="Attendance"></div>
-        <h3>Attendance</h3>
-        <p>Students की daily attendance और reports को digital workflow में manage करें।</p>
-      </article>
-
-      <article class="module">
-        <div class="module-pic"><img src="images/Exam.png" alt="Exam"></div>
-        <h3>Examination & Marks</h3>
-        <p>Exam selection, marks entry और academic result workflow के लिए module।</p>
-      </article>
-
-      <article class="module">
-        <div class="module-pic"><img src="images/I%20Card.png" alt="I Card"></div>
-        <h3>Identity Card</h3>
-        <p>School identity card records और related printing workflow।</p>
-      </article>
-
-      <article class="module">
-        <div class="module-pic"><img src="images/Empoloyee%20Master.png" alt="Employee Master"></div>
-        <h3>Employee Master</h3>
-        <p>School staff और employee information का digital management।</p>
-      </article>
+      <div class="erp-card"><div class="erp-icon">🔄</div><strong>Student Promotion</strong><span>Class promotion</span></div>
+      <div class="erp-card"><div class="erp-icon">🪪</div><strong>Identity Card</strong><span>ID card management</span></div>
+      <div class="erp-card"><div class="erp-icon">📱</div><strong>Mobile Setup</strong><span>Mobile ERP setup</span></div>
+      <div class="erp-card erp-link-card" onclick="window.open('https://shantiraman.co.in/','_blank')"><div class="erp-icon">🌐</div><strong>Go to Web</strong><span>Open website</span></div>
+      <div class="erp-card coming-card"><div class="erp-icon">✨</div><strong>Coming Soon</strong><span>New modules</span></div>
     </div>
   </div>
 </section>
+
 
 <section class="section" style="padding-top:0;">
   <div class="container split">
@@ -531,33 +661,29 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
 
 <section class="section" style="padding-top:0;">
   <div class="container">
-    <div class="head">
-      <div class="kicker">Software Gallery</div>
-      <h2>ERP का Interface देखिए</h2>
-      <p>Software के अलग-अलग screens और modules का preview देखें।</p>
-    </div>
-
-    <div class="gallery">
-      <div class="gallery-card"><img src="images/Admission%20Form.png" alt="Admission Form"></div>
-      <div class="gallery-card"><img src="images/Fee%20Receipt.png" alt="Fee Receipt"></div>
-      <div class="gallery-card"><img src="images/Exam.png" alt="Exam"></div>
-      <div class="gallery-card"><img src="images/Menu.png" alt="ERP Menu"></div>
-    </div>
-
-    <div style="text-align:center;margin-top:24px;">
-      <a href="gallery.html" class="btn btn-main">पूरी Gallery देखें →</a>
+    <div class="cta">
+      <div class="kicker" style="color:#ffb36c;">Start with Shantiraman ERP</div>
+      <h2>अपने School को Digital बनाइए</h2>
+      <p>School management को smart और सरल बनाने के लिए हमसे सीधे संपर्क करें।</p>
+      <a class="btn btn-light" href="https://wa.me/919415469746" target="_blank" rel="noopener">💬 WhatsApp</a>
     </div>
   </div>
 </section>
 
-<section class="section" style="padding-top:0;">
+<section class="social-section">
   <div class="container">
-    <div class="cta">
-      <div class="kicker" style="color:#ffb36c;">Start with Shantiraman ERP</div>
-      <h2>अपने School को Digital बनाइए</h2>
-      <p>ERP Login करके system के modules देखें या software demo के लिए सीधे संपर्क करें।</p>
-      <a class="btn btn-light" href="https://login.shantiraman.co.in" target="_blank" rel="noopener">🔐 ERP Login</a>
-      <a class="btn btn-light" href="https://wa.me/919415469746" target="_blank" rel="noopener">💬 WhatsApp</a>
+    <div class="social-box">
+      <div>
+        <div class="kicker">Connect With Us</div>
+        <h2>हमसे जुड़े रहिए</h2>
+        <p>Shantiraman ERP की नई जानकारी और updates के लिए हमारे social platforms से जुड़ें।</p>
+      </div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/annutkarsh" target="_blank" rel="noopener" aria-label="Facebook">f <span>Facebook</span></a>
+        <a href="https://www.instagram.com/annutkarshrita/" target="_blank" rel="noopener" aria-label="Instagram">◎ <span>Instagram</span></a>
+        <a href="https://www.youtube.com/@annutkarshrita" target="_blank" rel="noopener" aria-label="YouTube">▶ <span>YouTube</span></a>
+        <a href="https://wa.me/919415469746" target="_blank" rel="noopener">◉ <span>WhatsApp</span></a>
+      </div>
     </div>
   </div>
 </section>
@@ -575,7 +701,7 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
 
         <div class="row">
           <div class="icon">✉</div>
-          <div><strong>Email</strong><span>info@shantiraman.co.in</span></div>
+          <div><strong>Email</strong><span>shanteeraman@gmail.com</span></div>
         </div>
 
         <div class="row">
@@ -628,7 +754,109 @@ function toggleMenu(){
 function closeMenu(){
   document.getElementById("mobileNav").style.display="none";
 }
-</script>
+
+function openLogin(e){
+  if(e) e.preventDefault();
+  document.getElementById("loginModal").classList.add("show");
+  showLoginStep(1);
+  document.body.style.overflow="hidden";
+}
+function closeLogin(){
+  document.getElementById("loginModal").classList.remove("show");
+  document.body.style.overflow="";
+}
+function modalOutside(e){
+  if(e.target.id==="loginModal") closeLogin();
+}
+function showLoginStep(n){
+  document.querySelectorAll(".login-step").forEach(x=>x.classList.remove("active"));
+  document.getElementById("loginStep"+n).classList.add("active");
+}
+function choosePortal(type){
+  if(type==="school"){
+    showLoginStep(2);
+    return;
+  }
+  if(type==="student"){
+    window.location.href="https://login.shantiraman.co.in/login?portal=student";
+    return;
+  }
+  if(type==="guardian"){
+    window.location.href="https://login.shantiraman.co.in/login?portal=guardian";
+  }
+}
+function chooseSchool(code){
+  window.selectedSchool=code;
+  showLoginStep(3);
+}
+function goRole(role){
+  const school=window.selectedSchool || "ramraji";
+  window.location.href="https://login.shantiraman.co.in/login?school="+encodeURIComponent(school)+"&role="+encodeURIComponent(role);
+}
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape") closeLogin();
+});
+
+(function(){const x=document.querySelectorAll(".tv-slide");if(!x.length)return;let i=0;setInterval(function(){x[i].classList.remove("active");i=(i+1)%x.length;x[i].classList.add("active")},3500)})();\n</script>
+
+
+<!-- LOGIN FLOW MODAL -->
+<div id="loginModal" class="login-modal" onclick="modalOutside(event)">
+  <div class="login-card">
+    <button class="login-close" onclick="closeLogin()" aria-label="Close">×</button>
+
+    <div class="login-brand">
+      <img src="Shantiramanlogo.png" alt="Shantiraman ERP">
+      <h2>Shantiraman ERP</h2>
+      <p>Login / Select School</p>
+    </div>
+
+    <div id="loginStep1" class="login-step active">
+      <div class="login-step-title">आप किस प्रकार Login करना चाहते हैं?</div>
+      <div class="login-options">
+        <div class="login-option" onclick="choosePortal('school')">
+          <span class="ico">🏫</span>School
+        </div>
+        <div class="login-option" onclick="choosePortal('student')">
+          <span class="ico">🎓</span>Student
+        </div>
+        <div class="login-option" onclick="choosePortal('guardian')">
+          <span class="ico">👨‍👩‍👧</span>Guardian
+        </div>
+      </div>
+      <div class="login-note">School login में पहले School और फिर आपका Role चुना जाएगा।</div>
+    </div>
+
+    <div id="loginStep2" class="login-step">
+      <div class="login-step-title">School चुनें</div>
+      <div class="login-options">
+        <div class="login-option" onclick="chooseSchool('ramraji')">
+          <span class="ico">🏫</span>Ram Raji
+        </div>
+      </div>
+      <button class="login-back" onclick="showLoginStep(1)">← वापस जाएँ</button>
+    </div>
+
+    <div id="loginStep3" class="login-step">
+      <div class="login-step-title">अपना Role चुनें</div>
+      <div class="role-options">
+        <div class="role-option" onclick="goRole('classteacher')">
+          <span class="role-icon">👩‍🏫</span>
+          <span>Class Teacher</span>
+        </div>
+        <div class="role-option" onclick="goRole('teacher')">
+          <span class="role-icon">📚</span>
+          <span>Teacher</span>
+        </div>
+        <div class="role-option" onclick="goRole('admin')">
+          <span class="role-icon">⚙️</span>
+          <span>Admin</span>
+        </div>
+      </div>
+      <button class="login-back" onclick="showLoginStep(2)">← School बदलें</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
