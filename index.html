@@ -103,6 +103,13 @@ nav a:hover{color:var(--blue)}
   border:0;background:#edf4fc;color:var(--navy);
   width:42px;height:42px;border-radius:10px;font-size:22px;
 }
+.mobile-actions{display:none;align-items:center;gap:8px}
+.mobile-login{
+  background:var(--orange);color:#fff!important;
+  padding:10px 13px;border-radius:10px;
+  font-size:13px;font-weight:800;
+  box-shadow:0 7px 16px rgba(242,139,48,.20);
+}
 
 /* HERO */
 .hero{
@@ -351,6 +358,7 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
 
 @media(max-width:900px){
   nav{display:none}
+  .mobile-actions{display:flex}
   .menu{display:block}
   .hero-grid,.split,.contact{grid-template-columns:1fr}
   .modules{grid-template-columns:repeat(2,1fr)}
@@ -530,7 +538,10 @@ footer{background:#07172b;color:#aebdd0;padding:25px 0}
       <a class="login" href="#login" onclick="openLogin(event)">LOGIN</a>
     </nav>
 
-    <button class="menu" onclick="toggleMenu()">☰</button>
+    <div class="mobile-actions">
+      <a class="mobile-login" href="#login" onclick="openLogin(event)">LOGIN</a>
+      <button class="menu" onclick="toggleMenu()">☰</button>
+    </div>
   </div>
 
   <div id="mobileNav" style="display:none;background:#fff;border-top:1px solid #edf1f5;">
