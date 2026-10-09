@@ -17,6 +17,8 @@ button:hover{background:#1f3765}.save{margin-top:15px;width:100%;font-size:16px}
 .msg{padding:11px;border-radius:8px;margin-bottom:14px;line-height:1.5}.error{background:#fde8e8;color:#b91c1c}.success{background:#e8f7ed;color:#166534}
 table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#eef2f7}
 .marks{max-width:130px}.info{margin-top:14px;padding:10px;background:#f5f7fb;border-radius:8px}
+.return-home{display:block;width:100%;box-sizing:border-box;margin-top:10px;padding:12px;background:#198754;color:#fff;text-align:center;text-decoration:none;font-weight:bold;border-radius:8px}
+.return-home:hover{background:#146c43}
 @media(max-width:650px){.grid{grid-template-columns:1fr}.container{padding:14px}body{padding:8px}table{font-size:14px}}
 </style>
 </head>
@@ -91,6 +93,14 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid
 {% endif %}
 </form>
 
+<a class="return-home" href="{{ url_for('exam_marks',
+    exam=selected_exam,
+    class_name=selected_class,
+    section=selected_section,
+    subject=selected_subject,
+    subsubject=selected_subsubject
+) }}">🏠 Return to Home (Exam / Marks)</a>
+
 {% if students and max_marks %}
 <div class="info">Class: <b>{{ selected_class }}</b> &nbsp; Section: <b>{{ selected_section }}</b> &nbsp; Subject: <b>{{ selected_subject }}</b> &nbsp; SubSubject: <b>{{ selected_subsubject }}</b> &nbsp; Max Marks: <b>{{ max_marks }}</b></div>
 <form method="POST">
@@ -114,6 +124,13 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid
 </table>
 <button class="save" type="submit">Marks Save / Update करें</button>
 </form>
+<a class="return-home" href="{{ url_for('exam_marks',
+    exam=selected_exam,
+    class_name=selected_class,
+    section=selected_section,
+    subject=selected_subject,
+    subsubject=selected_subsubject
+) }}">🏠 Return to Home (Exam / Marks)</a>
 {% elif selected_subject and selected_subsubject and not error %}
 <div class="msg error">इस Class/Section में कोई Active Student नहीं मिला।</div>
 {% endif %}
