@@ -14,18 +14,23 @@ h2{margin:0 0 5px;color:#29457c} .session{color:#666;margin-bottom:18px}
 select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;background:#fff}
 button{border:0;border-radius:8px;padding:11px 18px;background:#29457c;color:#fff;font-weight:bold;cursor:pointer}
 button:hover{background:#1f3765}.save{margin-top:15px;width:100%;font-size:16px}
+.nav-buttons{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 18px}
+.nav-btn{display:inline-block;text-decoration:none;text-align:center;border-radius:8px;padding:10px 15px;background:#198754;color:#fff;font-weight:bold}
+.nav-btn.mark-btn{background:#29457c}.nav-btn:hover{opacity:.9}
 .msg{padding:11px;border-radius:8px;margin-bottom:14px;line-height:1.5}.error{background:#fde8e8;color:#b91c1c}.success{background:#e8f7ed;color:#166534}
 table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#eef2f7}
 .marks{max-width:130px}.info{margin-top:14px;padding:10px;background:#f5f7fb;border-radius:8px}
-.return-home{display:block;width:100%;box-sizing:border-box;margin-top:10px;padding:12px;background:#198754;color:#fff;text-align:center;text-decoration:none;font-weight:bold;border-radius:8px}
-.return-home:hover{background:#146c43}
 @media(max-width:650px){.grid{grid-template-columns:1fr}.container{padding:14px}body{padding:8px}table{font-size:14px}}
+.mark-entry-cell{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.mark-entry-cell .marks{width:110px}.status-option{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:13px}.status-check{width:auto!important;margin:0}
 </style>
 </head>
 <body>
 <div class="container">
 <h2>Exam Marks Entry</h2>
 <div class="session">{{ school_name }} | Active Session: <b>{{ session_name }}</b></div>
+<div class="nav-buttons">
+  <a class="nav-btn" href="{{ url_for('teacher_dashboard') }}">← Back to Dashboard</a>
+</div>
 
 {% if error %}<div class="msg error">{{ error }}</div>{% endif %}
 {% if success %}<div class="msg success">{{ success }}</div>{% endif %}
@@ -93,14 +98,6 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid
 {% endif %}
 </form>
 
-<a class="return-home" href="{{ url_for('exam_marks',
-    exam=selected_exam,
-    class_name=selected_class,
-    section=selected_section,
-    subject=selected_subject,
-    subsubject=selected_subsubject
-) }}">🏠 Return to Home (Exam / Marks)</a>
-
 {% if students and max_marks %}
 <div class="info">Class: <b>{{ selected_class }}</b> &nbsp; Section: <b>{{ selected_section }}</b> &nbsp; Subject: <b>{{ selected_subject }}</b> &nbsp; SubSubject: <b>{{ selected_subsubject }}</b> &nbsp; Max Marks: <b>{{ max_marks }}</b></div>
 <form method="POST">
@@ -111,29 +108,47 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid
 <input type="hidden" name="subsubject" value="{{ selected_subsubject }}">
 <input type="hidden" name="action" value="save">
 <table>
-<thead><tr><th>Sr No</th><th>Student Name</th><th>Obtained Marks (0 - {{ max_marks }})</th></tr></thead>
+<thead><tr><th>Sr No</th><th>Student Name</th><th>प्राप्तांक / स्थिति (0 - {{ max_marks }})</th></tr></thead>
 <tbody>
 {% for st in students %}
 <tr>
 <td>{{ st.srno }}</td>
 <td>{{ st.name }}</td>
-<td><input class="marks" type="number" step="0.01" min="0" max="{{ max_marks }}" name="marks_{{ st.id }}" value="{{ st.obtmarks }}"></td>
+<td>
+  <div class="mark-entry-cell">
+    <input class="marks" type="number" step="0.01" min="0" max="{{ max_marks }}" name="marks_{{ st.id }}" value="{{ st.obtmarks }}" {% if st.status in ['a','absent','m','medical'] %}disabled{% endif %}>
+    <label class="status-option"><input class="status-check absent-check" type="checkbox" name="absent_{{ st.id }}" value="1" {% if st.status in ['a','absent'] %}checked{% endif %} onchange="toggleStatus(this, 'absent')"> A = Absent</label>
+    <label class="status-option"><input class="status-check medical-check" type="checkbox" name="medical_{{ st.id }}" value="1" {% if st.status in ['m','medical'] %}checked{% endif %} onchange="toggleStatus(this, 'medical')"> M = Medical</label>
+  </div>
+</td>
 </tr>
 {% endfor %}
 </tbody>
 </table>
 <button class="save" type="submit">Marks Save / Update करें</button>
 </form>
-<a class="return-home" href="{{ url_for('exam_marks',
-    exam=selected_exam,
-    class_name=selected_class,
-    section=selected_section,
-    subject=selected_subject,
-    subsubject=selected_subsubject
-) }}">🏠 Return to Home (Exam / Marks)</a>
+<div class="nav-buttons">
+  <a class="nav-btn" href="{{ url_for('teacher_dashboard') }}">← Back to Dashboard</a>
+</div>
 {% elif selected_subject and selected_subsubject and not error %}
 <div class="msg error">इस Class/Section में कोई Active Student नहीं मिला।</div>
 {% endif %}
 </div>
+<script>
+function toggleStatus(el, kind){
+  const row = el.closest('tr');
+  const marks = row.querySelector('.marks');
+  const absent = row.querySelector('.absent-check');
+  const medical = row.querySelector('.medical-check');
+  if (el.checked) {
+    if (kind === 'absent') medical.checked = false;
+    else absent.checked = false;
+    marks.value = '';
+    marks.disabled = true;
+  } else {
+    marks.disabled = absent.checked || medical.checked;
+  }
+}
+</script>
 </body>
 </html>
