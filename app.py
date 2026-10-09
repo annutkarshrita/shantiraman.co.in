@@ -932,7 +932,7 @@ def exam_marks():
                               OR LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), sa.SessStatus)))) IN
                                  ('active','1','true','yes')
                           )
-                        ORDER BY TRY_CONVERT(INT,sm.SrNo), sm.SrNo
+                        ORDER BY TRY_CONVERT(INT,sm.Student), sm.Student
                     """, session_id, selected_class, selected_section)
 
                     for r in cur.fetchall():
