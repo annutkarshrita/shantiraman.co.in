@@ -205,6 +205,65 @@ def _sort_by_master_order(cur, category, values):
         key=lambda name: (order_map.get(name.casefold(), 2147483647), name.casefold())
     )
 
+
+def _is_optional_subject(cur, class_name, section, subject_name):
+    """
+    Selected subject को SubjectSetup के IsOptional/OptionalSubject flag से पहचानें.
+    Schema column names runtime पर खोजे जाते हैं ताकि पुराने नाम वाले DB भी चलें.
+    """
+    cur.execute("""
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA='dbo' AND TABLE_NAME='SubjectSetup'
+    """)
+    cols = {
+        str(row[0]).strip().lower(): str(row[0]).strip()
+        for row in cur.fetchall()
+    }
+
+    def pick(names):
+        for name in names:
+            found = cols.get(name.lower())
+            if found:
+                return found
+        return None
+
+    class_col = pick(["Class", "ClassName"])
+    section_col = pick(["Section", "SectionName"])
+    subject_col = pick(["Subject", "SubjectName"])
+    optional_col = pick(["IsOptional", "OptionalSubject"])
+
+    # यदि यह पुराना DB है जिसमें Optional flag मौजूद नहीं, तो पुराना behaviour रखें.
+    if not all([class_col, section_col, subject_col, optional_col]):
+        return False
+
+    def q(identifier):
+        return "[" + identifier.replace("]", "]]") + "]"
+
+    cur.execute(f"""
+        SELECT CASE WHEN EXISTS (
+            SELECT 1
+            FROM dbo.SubjectSetup
+            WHERE UPPER(LTRIM(RTRIM(CONVERT(NVARCHAR(255), ISNULL({q(class_col)}, '')))))
+                      = UPPER(LTRIM(RTRIM(?)))
+              AND UPPER(LTRIM(RTRIM(CONVERT(NVARCHAR(255), ISNULL({q(section_col)}, '')))))
+                      = UPPER(LTRIM(RTRIM(?)))
+              AND UPPER(LTRIM(RTRIM(CONVERT(NVARCHAR(255), ISNULL({q(subject_col)}, '')))))
+                      = UPPER(LTRIM(RTRIM(?)))
+              AND LOWER(LTRIM(RTRIM(CONVERT(NVARCHAR(20), ISNULL({q(optional_col)}, 0)))))
+                      IN ('1', 'true', 'yes', 'y', 'optional')
+        ) THEN 1 ELSE 0 END
+    """, (class_name, section, subject_name))
+    row = cur.fetchone()
+    return bool(row and row[0])
+
+
+def _optional_assignment_table_exists(cur):
+    cur.execute("SELECT CASE WHEN OBJECT_ID(N'dbo.StudentOptionalSubject', N'U') IS NULL THEN 0 ELSE 1 END")
+    row = cur.fetchone()
+    return bool(row and row[0])
+
+
 @app.route("/exam-marks", methods=["GET", "POST"])
 def exam_marks():
     if "employee_id" not in session:
@@ -458,23 +517,72 @@ def exam_marks():
                 if not session_id:
                     error = "Active Session à¤¨à¤¹à¥€à¤‚ à¤®à¤¿à¤²à¥€à¥¤ à¤ªà¤¹à¤²à¥‡ SessionTable à¤®à¥‡à¤‚ Active Session à¤¸à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚à¥¤"
                 else:
-                    cur.execute("""
-                        SELECT sm.ID, sm.SrNo, sm.Student
-                        FROM dbo.StudentMaster sm
-                        INNER JOIN dbo.StudentAcademic sa
-                            ON sa.StudentID = sm.ID
-                        WHERE sa.SessionID = ?
-                          AND LTRIM(RTRIM(ISNULL(sa.Class,''))) = ?
-                          AND LTRIM(RTRIM(ISNULL(sa.Section,''))) = ?
-                          AND (
-                              sa.SessStatus IS NULL
-                              OR LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), sa.SessStatus)))) IN
-                                 ('active','1','true','yes')
-                          )
-                        ORDER BY TRY_CONVERT(INT,sm.Student), sm.Student
-                    """, session_id, selected_class, selected_section)
+                    # Optional subject होने पर सामान्य शिक्षक को केवल वही विद्यार्थी
+                    # दिखें जिन्हें My Students में यही विषय assign किया गया है।
+                    # Admin की पुरानी unrestricted access बनी रहती है।
+                    is_optional = _is_optional_subject(
+                        cur, selected_class, selected_section, selected_subject
+                    )
+                    student_rows = []
 
-                    for r in cur.fetchall():
+                    if is_optional and allowed is not None:
+                        if not _optional_assignment_table_exists(cur):
+                            error = (
+                                "Optional Subject assignment अभी तैयार नहीं है। "
+                                "पहले My Students खोलकर विद्यार्थियों के Optional Subject Assign करें।"
+                            )
+                        else:
+                            cur.execute("""
+                                SELECT sm.ID, sm.SrNo, sm.Student
+                                FROM dbo.StudentMaster sm
+                                INNER JOIN dbo.StudentAcademic sa
+                                    ON sa.StudentID = sm.ID
+                                WHERE sa.SessionID = ?
+                                  AND LTRIM(RTRIM(ISNULL(sa.Class,''))) = ?
+                                  AND LTRIM(RTRIM(ISNULL(sa.Section,''))) = ?
+                                  AND (
+                                      sa.SessStatus IS NULL
+                                      OR LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), sa.SessStatus)))) IN
+                                         ('active','1','true','yes')
+                                  )
+                                  AND EXISTS (
+                                      SELECT 1
+                                      FROM dbo.StudentOptionalSubject osa
+                                      WHERE LTRIM(RTRIM(CONVERT(NVARCHAR(100), osa.SessionID))) =
+                                            LTRIM(RTRIM(CONVERT(NVARCHAR(100), ?)))
+                                        AND LTRIM(RTRIM(CONVERT(NVARCHAR(100), osa.StudentID))) =
+                                            LTRIM(RTRIM(CONVERT(NVARCHAR(100), sm.ID)))
+                                        AND UPPER(LTRIM(RTRIM(ISNULL(osa.ClassName,'')))) =
+                                            UPPER(LTRIM(RTRIM(?)))
+                                        AND UPPER(LTRIM(RTRIM(ISNULL(osa.SectionName,'')))) =
+                                            UPPER(LTRIM(RTRIM(?)))
+                                        AND UPPER(LTRIM(RTRIM(ISNULL(osa.SubjectName,'')))) =
+                                            UPPER(LTRIM(RTRIM(?)))
+                                  )
+                                ORDER BY TRY_CONVERT(INT,sm.Student), sm.Student
+                            """, session_id, selected_class, selected_section,
+                                 session_id, selected_class, selected_section, selected_subject)
+                            student_rows = cur.fetchall()
+                    else:
+                        # अनिवार्य विषय या Admin: पुरानी student list logic.
+                        cur.execute("""
+                            SELECT sm.ID, sm.SrNo, sm.Student
+                            FROM dbo.StudentMaster sm
+                            INNER JOIN dbo.StudentAcademic sa
+                                ON sa.StudentID = sm.ID
+                            WHERE sa.SessionID = ?
+                              AND LTRIM(RTRIM(ISNULL(sa.Class,''))) = ?
+                              AND LTRIM(RTRIM(ISNULL(sa.Section,''))) = ?
+                              AND (
+                                  sa.SessStatus IS NULL
+                                  OR LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), sa.SessStatus)))) IN
+                                     ('active','1','true','yes')
+                              )
+                            ORDER BY TRY_CONVERT(INT,sm.Student), sm.Student
+                        """, session_id, selected_class, selected_section)
+                        student_rows = cur.fetchall()
+
+                    for r in student_rows:
                         students.append({
                             "id": str(r[0]).strip(),
                             "srno": str(r[1] or "").strip(),
@@ -482,6 +590,12 @@ def exam_marks():
                             "studentid": str(r[0]).strip(),
                             "obtmarks": ""
                         })
+
+                    if is_optional and allowed is not None and not students and not error:
+                        error = (
+                            "इस Optional Subject के लिए किसी विद्यार्थी को Assign नहीं किया गया है। "
+                            "पहले My Students में Optional Subject Assign करें।"
+                        )
 
                     # Existing marks: à¤à¤• à¤¹à¥€ query à¤®à¥‡à¤‚ à¤¸à¤­à¥€ students à¤•à¥‡ marks load à¤•à¤°à¥‡à¤‚
                     student_ids = [st["id"] for st in students]
@@ -522,7 +636,7 @@ def exam_marks():
                     # Blank marks with no status clears the existing record.
                     # A=Absent and M=Medical are stored separately from numeric marks.
                     # --------------------------------------------
-                    if request.method == "POST" and request.form.get("action") == "save":
+                    if not error and request.method == "POST" and request.form.get("action") == "save":
                         row_actions = []
                         for st in students:
                             student_id = st["id"]
