@@ -523,6 +523,41 @@ def exam_marks():
                     is_optional = _is_optional_subject(
                         cur, selected_class, selected_section, selected_subject
                     )
+
+                    # यदि SubjectSetup में Optional flag नहीं है,
+                    # तो StudentOptionalSubject की प्रविष्टियों से जाँच करें।
+                    if (
+                        allowed is not None
+                        and not is_optional
+                        and _optional_assignment_table_exists(cur)
+                    ):
+                        cur.execute("""
+                            SELECT CASE WHEN EXISTS (
+                                SELECT 1
+                                FROM dbo.StudentOptionalSubject
+                                WHERE LTRIM(RTRIM(
+                                    CONVERT(NVARCHAR(100), SessionID)
+                                )) = LTRIM(RTRIM(
+                                    CONVERT(NVARCHAR(100), ?)
+                                ))
+                                  AND UPPER(LTRIM(RTRIM(
+                                      ISNULL(ClassName, '')
+                                  ))) = UPPER(LTRIM(RTRIM(?)))
+                                  AND UPPER(LTRIM(RTRIM(
+                                      ISNULL(SectionName, '')
+                                  ))) = UPPER(LTRIM(RTRIM(?)))
+                                  AND UPPER(LTRIM(RTRIM(
+                                      ISNULL(SubjectName, '')
+                                  ))) = UPPER(LTRIM(RTRIM(?)))
+                            ) THEN 1 ELSE 0 END
+                        """, session_id, selected_class,
+                             selected_section, selected_subject)
+
+                        optional_row = cur.fetchone()
+                        is_optional = bool(
+                            optional_row and optional_row[0]
+                        )
+
                     student_rows = []
 
                     if is_optional and allowed is not None:
