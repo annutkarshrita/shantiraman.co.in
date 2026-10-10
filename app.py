@@ -192,7 +192,7 @@ SMTP_EMAIL = "shanteeraman@gmail.com"
 # Google App Password à¤®à¥‡à¤‚ spaces à¤¹à¤Ÿà¤¾à¤•à¤° 16 characters à¤¡à¤¾à¤²à¥‡à¤‚à¥¤
 # à¤‡à¤¸à¥‡ à¤•à¤¿à¤¸à¥€ à¤•à¥‡ à¤¸à¤¾à¤¥ share à¤¨ à¤•à¤°à¥‡à¤‚à¥¤
 # ============================================================
-SMTP_APP_PASSWORD = os.environ.get("SHANTIRAMAN_SMTP_APP_PASSWORD", "")
+SMTP_APP_PASSWORD = os.environ.get("ctkudrfepqievmge", "")
 
 OTP_VALID_MINUTES = 5
 FORGOT_OTP = {}
