@@ -1,17 +1,108 @@
 <!doctype html>
-<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Students</title><style>
-body{margin:0;font-family:Arial;background:#f1f5f9;color:#172554}.wrap{max-width:1100px;margin:auto;padding:15px}
-.head,.box{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 4px 15px #0001}.head{background:#17365d;color:#fff}
-h2{margin:0 0 5px}.back{display:inline-block;margin-bottom:12px;text-decoration:none;color:#17365d;font-weight:bold}
-.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:700px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#eaf0f7}
-.view{padding:7px 11px;border-radius:7px;background:#17365d;color:white;text-decoration:none}
-.error{background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px}
-</style></head><body><div class="wrap">
-<a class="back" href="{{ url_for('teacher_dashboard') }}">← Dashboard</a>
-<div class="head"><h2>My Students</h2>{{ class_name }} - {{ section }} | Session: {{ session_name }}</div>
-{% if error %}<div class="error">{{ error }}</div>{% endif %}
-<div class="box"><b>Total Students: {{ students|length }}</b></div>
-<div class="box tablewrap"><table><thead><tr><th>SL</th><th>Sr No</th><th>Student Name</th><th>Father's Name</th><th>Mother's Name</th><th>DOB</th><th>View</th></tr></thead>
-<tbody>{% for s in students %}<tr><td>{{ loop.index }}</td><td>{{ s.srno }}</td><td>{{ s.name }}</td><td>{{ s.father }}</td><td>{{ s.mother }}</td><td>{{ s.dob }}</td><td><a class="view" href="{{ url_for('my_student_detail',student_id=s.id) }}">View</a></td></tr>{% endfor %}</tbody></table></div>
-</div></body></html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Students - Optional Subject Assignment</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#f1f5f9;color:#172033}
+.top{background:#173b6d;color:#fff;padding:15px 18px}
+.top h2{margin:0 0 5px;font-size:21px}
+.top .school{font-size:14px;opacity:.95}
+.wrap{max-width:1250px;margin:auto;padding:14px}
+.back{display:inline-block;margin:0 0 12px;text-decoration:none;color:#173b6d;font-weight:bold}
+.info{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 9px #0000000a;display:flex;flex-wrap:wrap;gap:8px 20px}
+.pill{background:#eaf1fb;border-radius:20px;padding:6px 10px;font-size:13px}
+.message{padding:11px 13px;border-radius:9px;margin-bottom:12px;white-space:pre-line}
+.error{background:#fee2e2;color:#991b1b}
+.success{background:#dcfce7;color:#166534}
+.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 10px #0000000a}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th,td{padding:8px 9px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:middle}
+th{background:#edf2f8;color:#243650;font-size:13px;white-space:nowrap}
+td{font-size:14px}
+tbody tr:hover{background:#f8fafc}
+.dob{white-space:nowrap;font-size:13px;color:#334155}
+select{width:100%;min-width:180px;padding:9px 8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:14px}
+.btn{display:inline-block;border:0;border-radius:9px;padding:9px 13px;font-weight:bold;text-decoration:none;cursor:pointer;text-align:center;font-size:13px}
+.view{background:#e6efff;color:#173b6d;white-space:nowrap}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:13px}
+.save{background:#173b6d;color:#fff;font-size:15px;padding:12px 18px}
+.hint{font-size:12px;color:#64748b;line-height:1.45}
+.empty{text-align:center;padding:22px;color:#64748b}
+@media(max-width:650px){.wrap{padding:9px}.top{padding:13px}.top h2{font-size:19px}.info{gap:6px}.card{padding:7px}th,td{padding:7px}select{min-width:165px}.save{width:100%}.actions{align-items:stretch}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h2>My Students</h2>
+  <div class="school">{{ school_name }}</div>
+</div>
+<div class="wrap">
+  <a class="back" href="{{ url_for('teacher_dashboard') }}">← Dashboard</a>
+
+  <div class="info">
+    <span class="pill"><b>Class:</b> {{ class_name or '-' }}</span>
+    <span class="pill"><b>Section:</b> {{ section or '-' }}</span>
+    <span class="pill"><b>Session:</b> {{ session_name or '-' }}</span>
+    <span class="pill"><b>Total Students:</b> {{ students|length }}</span>
+  </div>
+
+  {% if error %}<div class="message error">{{ error }}</div>{% endif %}
+  {% if success %}<div class="message success">{{ success }}</div>{% endif %}
+
+  <form method="post" action="{{ url_for('my_students') }}">
+    <input type="hidden" name="action" value="assign_all">
+    <div class="card">
+      {% if students %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sr No</th>
+              <th>Student Name</th>
+              <th>Father's Name</th>
+              <th>DOB</th>
+              <th>Optional Subject</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for x in students %}
+            {% set current_subject = assigned_subjects.get(x.id, '') %}
+            <tr>
+              <td>{{ x.srno or '-' }}</td>
+              <td><b>{{ x.name or '-' }}</b></td>
+              <td>{{ x.father or '-' }}</td>
+              <td class="dob">{{ x.dob_display or '-' }}</td>
+              <td>
+                <select name="optional_subject_{{ x.id }}" aria-label="{{ x.name }} का Optional Subject">
+                  <option value="">-- Subject चुनें --</option>
+                  {% if current_subject and current_subject not in optional_subjects %}
+                    <option value="{{ current_subject }}" selected>{{ current_subject }} (पहले से assigned)</option>
+                  {% endif %}
+                  {% for subject in optional_subjects %}
+                    <option value="{{ subject }}" {% if current_subject == subject %}selected{% endif %}>{{ subject }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td><a class="btn view" href="{{ url_for('my_student_detail', student_id=x.id) }}">View</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <span class="hint">एक-एक विद्यार्थी का विषय चुनें, फिर नीचे का बटन केवल एक बार दबाएँ। खाली छोड़ी गई पंक्ति का पुराना assignment नहीं हटेगा।</span>
+        <button class="btn save" type="submit">Assign All Optional Subjects</button>
+      </div>
+      {% else %}
+      <div class="empty">इस Class/Section में कोई Active Student नहीं मिला।</div>
+      {% endif %}
+    </div>
+  </form>
+</div>
+</body>
+</html>
