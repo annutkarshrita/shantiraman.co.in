@@ -13,7 +13,11 @@ h2{margin:0 0 5px;color:#29457c} .session{color:#666;margin-bottom:18px}
 .field label{display:block;font-weight:bold;margin-bottom:6px}
 select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;background:#fff}
 button{border:0;border-radius:8px;padding:11px 18px;background:#29457c;color:#fff;font-weight:bold;cursor:pointer}
-button:hover{background:#1f3765}.save{margin-top:15px;width:100%;font-size:16px}
+button:hover{background:#1f3765}
+.mark-actions{display:flex;gap:10px;margin-top:15px}
+.mark-actions .save{margin:0;width:100%;font-size:15px;min-height:46px}
+.small-note{font-size:13px;color:#5f6b7a;margin-top:9px;line-height:1.5}
+@media(max-width:600px){.mark-actions{display:block}}
 .nav-buttons{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 18px}
 .nav-btn{display:inline-block;text-decoration:none;text-align:center;border-radius:8px;padding:10px 15px;background:#198754;color:#fff;font-weight:bold}
 .nav-btn.mark-btn{background:#29457c}.nav-btn:hover{opacity:.9}
@@ -106,7 +110,6 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid
 <input type="hidden" name="section" value="{{ selected_section }}">
 <input type="hidden" name="subject" value="{{ selected_subject }}">
 <input type="hidden" name="subsubject" value="{{ selected_subsubject }}">
-<input type="hidden" name="action" value="save">
 <table>
 <thead><tr><th>Sr No</th><th>Student Name</th><th>प्राप्तांक / स्थिति (0 - {{ max_marks }})</th></tr></thead>
 <tbody>
@@ -125,7 +128,10 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid
 {% endfor %}
 </tbody>
 </table>
-<button class="save" type="submit">Marks Save / Update करें</button>
+<div class="mark-actions">
+  <button class="save" type="submit">SAVE / UPDATE MARKS</button>
+</div>
+<div class="small-note">यहाँ SAVE / UPDATE MARKS करने के बाद रिकॉर्ड ExamMarks टेबल में सेव होगा। Marks Entry Status में जिस पेपर का रिकॉर्ड मौजूद होगा, वह अपने-आप Submitted दिखेगा। अलग Submit बटन की जरूरत नहीं है।</div>
 </form>
 <div class="nav-buttons">
   <a class="nav-btn" href="{{ url_for('teacher_dashboard') }}">← Back to Dashboard</a>

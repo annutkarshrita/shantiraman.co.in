@@ -49,6 +49,11 @@ body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#ee
             Exam / Marks
         </button>
 
+        <button class="card" onclick="location.href='{{ url_for("marks_entry_status") }}'">
+            <span class="icon">📋</span>
+            Marks Entry Status
+        </button>
+
         {% if role_norm in ['classteacher', 'admin', 'administrator', 'superadmin'] %}
         <button class="card" onclick="location.href='{{ url_for("my_students") }}'">
             <span class="icon">👨‍🎓</span>
