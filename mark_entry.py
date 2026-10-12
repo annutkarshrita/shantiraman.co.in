@@ -264,6 +264,10 @@ def _optional_assignment_table_exists(cur):
     return bool(row and row[0])
 
 
+
+# ============================================================
+# EXAM / MARKS ENTRY ROUTES
+# ============================================================
 @app.route("/exam-marks", methods=["GET", "POST"])
 def exam_marks():
     if "employee_id" not in session:
@@ -302,7 +306,6 @@ def exam_marks():
     try:
         conn = get_connection()
         cur = conn.cursor()
-
         # ----------------------------------------------------
         # 1. CLASS LIST - Exam à¤•à¥‡ à¤¬à¤¾à¤¦
         # ----------------------------------------------------
@@ -671,7 +674,8 @@ def exam_marks():
                     # Blank marks with no status clears the existing record.
                     # A=Absent and M=Medical are stored separately from numeric marks.
                     # --------------------------------------------
-                    if not error and request.method == "POST" and request.form.get("action") == "save":
+                    action_requested = "save"
+                    if not error and request.method == "POST":
                         row_actions = []
                         for st in students:
                             student_id = st["id"]
@@ -803,5 +807,239 @@ def exam_marks():
         session_name=session_name,
         error=error,
         success=success
+    )
+
+
+# ============================================================
+# MARKS ENTRY STATUS - DERIVED FROM EXISTING EXAMMARKS RECORDS
+# ============================================================
+@app.route("/marks-entry-status", methods=["GET"])
+def marks_entry_status():
+    if "employee_id" not in session:
+        return redirect(url_for("home"))
+
+    employee_id = session.get("employee_id")
+    role = session.get("role", "")
+    school_name = get_school_name()
+    session_id, session_name = get_active_session()
+    exams = master_exam_types()
+    selected_exam = request.args.get("exam", "").strip()
+
+    assignments = []
+    submitted_count = 0
+    pending_count = 0
+    error = None
+    conn = cur = None
+
+    def _norm_key(*values):
+        return tuple(str(value or "").strip().casefold() for value in values)
+
+    try:
+        if not session_id:
+            error = "Active Session नहीं मिली। पहले SessionTable में Active Session सेट करें।"
+        else:
+            conn = get_connection()
+            cur = conn.cursor()
+
+            # Older DB versions may not have the SubSubject column in the assignment table.
+            cur.execute("""
+                SELECT COLUMN_NAME
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA='dbo' AND TABLE_NAME='MobileTeacherSubjectAssign'
+            """)
+            assign_cols = {
+                str(row[0] or "").strip().casefold()
+                for row in cur.fetchall()
+            }
+            if not assign_cols:
+                raise RuntimeError("MobileTeacherSubjectAssign table या उसके columns नहीं मिले।")
+
+            subsubject_expr = (
+                "LTRIM(RTRIM(ISNULL(SubSubject,'')))"
+                if "subsubject" in assign_cols
+                else "CAST('' AS NVARCHAR(200))"
+            )
+
+            raw_assignments = []
+            if selected_exam:
+                sql = f"""
+                    SELECT DISTINCT
+                        LTRIM(RTRIM(ISNULL(Class,''))) AS ClassName,
+                        LTRIM(RTRIM(ISNULL(Section,''))) AS SectionName,
+                        LTRIM(RTRIM(ISNULL(Subject,''))) AS SubjectName,
+                        LTRIM(RTRIM(ISNULL(Exam,''))) AS ExamType,
+                        {subsubject_expr} AS SubSubject
+                    FROM dbo.MobileTeacherSubjectAssign
+                    WHERE EmployeeID = ?
+                      AND ISNULL(IsActive,0)=1
+                      AND LTRIM(RTRIM(CONVERT(NVARCHAR(100), ISNULL(SessionID,''))))=?
+                      AND UPPER(LTRIM(RTRIM(ISNULL(Exam,''))))=UPPER(LTRIM(RTRIM(?)))
+                      AND LTRIM(RTRIM(ISNULL(Class,''))) <> ''
+                      AND LTRIM(RTRIM(ISNULL(Subject,''))) <> ''
+                    ORDER BY ExamType, ClassName, SectionName, SubjectName, SubSubject
+                """
+                cur.execute(sql, employee_id, str(session_id), selected_exam)
+                raw_assignments = cur.fetchall()
+
+                # ExamMarks is the single source of truth. A paper is Submitted only
+                # when every applicable active student has marks or Absent/Medical saved.
+                # Mandatory subjects use the active class roster; optional subjects use
+                # only students assigned that optional subject in StudentOptionalSubject.
+                for row in raw_assignments:
+                    class_name = str(row[0] or "").strip()
+                    section_name = str(row[1] or "").strip()
+                    subject_name = str(row[2] or "").strip()
+                    exam_name = str(row[3] or "").strip()
+                    subsubject_name = str(row[4] or "").strip()
+
+                    # Determine the same applicable student set used by Marks Entry.
+                    is_optional = _is_optional_subject(
+                        cur, class_name, section_name, subject_name
+                    )
+                    if not is_optional and _optional_assignment_table_exists(cur):
+                        cur.execute("""
+                            SELECT CASE WHEN EXISTS (
+                                SELECT 1
+                                FROM dbo.StudentOptionalSubject
+                                WHERE LTRIM(RTRIM(CONVERT(NVARCHAR(100), SessionID))) =
+                                      LTRIM(RTRIM(CONVERT(NVARCHAR(100), ?)))
+                                  AND UPPER(LTRIM(RTRIM(ISNULL(ClassName,'')))) =
+                                      UPPER(LTRIM(RTRIM(?)))
+                                  AND UPPER(LTRIM(RTRIM(ISNULL(SectionName,'')))) =
+                                      UPPER(LTRIM(RTRIM(?)))
+                                  AND UPPER(LTRIM(RTRIM(ISNULL(SubjectName,'')))) =
+                                      UPPER(LTRIM(RTRIM(?)))
+                            ) THEN 1 ELSE 0 END
+                        """, session_id, class_name, section_name, subject_name)
+                        optional_row = cur.fetchone()
+                        is_optional = bool(optional_row and optional_row[0])
+
+                    roster_sql = """
+                        SELECT DISTINCT LTRIM(RTRIM(CONVERT(NVARCHAR(100), sm.ID))) AS StudentID
+                        FROM dbo.StudentMaster sm
+                        INNER JOIN dbo.StudentAcademic sa ON sa.StudentID = sm.ID
+                        WHERE LTRIM(RTRIM(CONVERT(NVARCHAR(100), sa.SessionID))) =
+                              LTRIM(RTRIM(CONVERT(NVARCHAR(100), ?)))
+                          AND UPPER(LTRIM(RTRIM(ISNULL(sa.Class,'')))) = UPPER(LTRIM(RTRIM(?)))
+                          AND UPPER(LTRIM(RTRIM(ISNULL(sa.Section,'')))) = UPPER(LTRIM(RTRIM(?)))
+                          AND (
+                              sa.SessStatus IS NULL
+                              OR LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), sa.SessStatus))))
+                                 IN ('active','1','true','yes')
+                          )
+                    """
+                    roster_params = [session_id, class_name, section_name]
+                    if is_optional:
+                        roster_sql += """
+                          AND EXISTS (
+                              SELECT 1 FROM dbo.StudentOptionalSubject osa
+                              WHERE LTRIM(RTRIM(CONVERT(NVARCHAR(100), osa.SessionID))) =
+                                    LTRIM(RTRIM(CONVERT(NVARCHAR(100), ?)))
+                                AND LTRIM(RTRIM(CONVERT(NVARCHAR(100), osa.StudentID))) =
+                                    LTRIM(RTRIM(CONVERT(NVARCHAR(100), sm.ID)))
+                                AND UPPER(LTRIM(RTRIM(ISNULL(osa.ClassName,'')))) =
+                                    UPPER(LTRIM(RTRIM(?)))
+                                AND UPPER(LTRIM(RTRIM(ISNULL(osa.SectionName,'')))) =
+                                    UPPER(LTRIM(RTRIM(?)))
+                                AND UPPER(LTRIM(RTRIM(ISNULL(osa.SubjectName,'')))) =
+                                    UPPER(LTRIM(RTRIM(?)))
+                          )
+                        """
+                        roster_params.extend([session_id, class_name, section_name, subject_name])
+                    cur.execute(roster_sql, *roster_params)
+                    expected_student_ids = {
+                        str(r[0] or "").strip() for r in cur.fetchall() if str(r[0] or "").strip()
+                    }
+
+                    # Get the latest saved record for each student for this exact paper.
+                    cur.execute("""
+                        SELECT StudentID, ObtMarks, AttendanceStatus, MarkEntryAt
+                        FROM (
+                            SELECT
+                                LTRIM(RTRIM(CONVERT(NVARCHAR(100), StudentID))) AS StudentID,
+                                ObtMarks,
+                                AttendanceStatus,
+                                TRY_CONVERT(DATETIME2, EntryDate) AS MarkEntryAt,
+                                ROW_NUMBER() OVER (
+                                    PARTITION BY StudentID
+                                    ORDER BY TRY_CONVERT(DATETIME, EntryDate) DESC,
+                                             EntryDate DESC, ID DESC
+                                ) AS rn
+                            FROM dbo.ExamMarks
+                            WHERE LTRIM(RTRIM(ISNULL(SessionName,''))) = ?
+                              AND UPPER(LTRIM(RTRIM(ISNULL(ExamType,'')))) = UPPER(LTRIM(RTRIM(?)))
+                              AND UPPER(LTRIM(RTRIM(ISNULL(ClassName,'')))) = UPPER(LTRIM(RTRIM(?)))
+                              AND UPPER(LTRIM(RTRIM(ISNULL(SectionName,'')))) = UPPER(LTRIM(RTRIM(?)))
+                              AND UPPER(LTRIM(RTRIM(ISNULL(SubjectName,'')))) = UPPER(LTRIM(RTRIM(?)))
+                              AND UPPER(LTRIM(RTRIM(ISNULL(SubSubject,'')))) = UPPER(LTRIM(RTRIM(?)))
+                        ) latest
+                        WHERE rn = 1
+                    """, session_name, exam_name, class_name, section_name,
+                         subject_name, subsubject_name)
+
+                    students_with_marks = set()
+                    last_entry = None
+                    for mark_row in cur.fetchall():
+                        student_id = str(mark_row[0] or "").strip()
+                        if not student_id or student_id not in expected_student_ids:
+                            continue
+                        obtained = "" if mark_row[1] is None else str(mark_row[1]).strip()
+                        attendance_status = str(mark_row[2] or "").strip()
+                        if obtained != "" or attendance_status != "":
+                            students_with_marks.add(student_id)
+                            entry_at = mark_row[3]
+                            if entry_at and (last_entry is None or entry_at > last_entry):
+                                last_entry = entry_at
+
+                    mark_count = len(students_with_marks)
+                    total_students = len(expected_student_ids)
+                    # Empty roster is not considered submitted. Otherwise every student
+                    # must have a numeric mark (including 0) or Absent/Medical status.
+                    is_submitted = total_students > 0 and mark_count == total_students
+                    submitted_at = last_entry
+                    if submitted_at and hasattr(submitted_at, "strftime"):
+                        submitted_at = submitted_at.strftime("%d-%m-%Y %H:%M")
+                    elif submitted_at:
+                        submitted_at = str(submitted_at)
+                    else:
+                        submitted_at = ""
+
+                    assignments.append({
+                        "class_name": class_name,
+                        "section": section_name,
+                        "subject": subject_name,
+                        "exam": exam_name,
+                        "subsubject": subsubject_name,
+                        "status": "Submitted" if is_submitted else "Pending",
+                        "submitted_at": submitted_at,
+                        "mark_count": mark_count,
+                        "total_students": total_students,
+                        "status_class": "submitted" if is_submitted else "pending"
+                    })
+
+        submitted_count = sum(1 for item in assignments if item["status"] == "Submitted")
+        pending_count = len(assignments) - submitted_count
+
+    except Exception as e:
+        error = "Marks Entry Status load नहीं हो पाया: " + str(e)
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+    return render_template(
+        "marks_entry_status.html",
+        teacher_name=session.get("user_name"),
+        role=role,
+        school_name=school_name,
+        session_name=session_name,
+        exams=exams,
+        selected_exam=selected_exam,
+        assignments=assignments,
+        total_count=len(assignments),
+        submitted_count=submitted_count,
+        pending_count=pending_count,
+        error=error
     )
 
