@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ school_name }} - Principal Dashboard</title>
+<style>
+:root{--blue:#244f82;--blue2:#326aa5;--bg:#eef3f8;--line:#e1e8f0;--muted:#66758a;--green:#137547;--red:#b42318;--amber:#925f00;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#1f2937;font-family:Arial,Helvetica,sans-serif;font-size:14px}
+header{background:linear-gradient(120deg,var(--blue),var(--blue2));color:#fff;padding:18px 16px;text-align:center}header h1{font-size:23px;margin:0 0 5px}header .sub{font-size:12px;opacity:.9}header .school{font-size:13px;margin-top:7px;opacity:.95}
+.wrap{max-width:1120px;width:100%;margin:0 auto;padding:14px 12px 28px}.welcome,.panel{background:var(--white);border-radius:13px;box-shadow:0 3px 11px rgba(24,49,77,.08);padding:16px;margin-bottom:14px}.welcome h2{font-size:18px;color:var(--blue);margin:0 0 9px}.meta{display:flex;gap:15px;flex-wrap:wrap;color:#4b5b6e}.meta span{display:inline-block}.section-heading{font-size:18px;color:var(--blue);margin:18px 0 10px}.menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.menu-card{display:flex;min-height:105px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#fff;border-radius:13px;box-shadow:0 3px 11px rgba(24,49,77,.08);padding:12px 8px;text-align:center;text-decoration:none;color:#182b40;font-weight:700;border:1px solid #e7edf4}.menu-card:hover{border-color:#9bb6d5}.menu-icon{font-size:25px;line-height:1}.menu-label{font-size:14px}.menu-note{font-weight:400;font-size:12px;color:var(--muted);line-height:1.3}.page-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 12px}.page-title{font-size:19px;color:var(--blue);margin:0}.back,.logout,.btn{display:inline-block;text-decoration:none;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:700;border:1px solid #cbd8e6;background:#fff;color:var(--blue);cursor:pointer}.logout{background:var(--blue);border-color:var(--blue);color:white}.logout-row{margin-top:14px;text-align:right}.panel h3{font-size:16px;color:var(--blue);margin:0 0 12px}.note{font-size:12px;color:var(--muted);line-height:1.4;margin:0 0 10px}.warn,.error{padding:10px 12px;border-radius:8px;margin:0 0 12px;font-size:13px;line-height:1.45;overflow-wrap:anywhere}.warn{background:#fff7e6;border:1px solid #ffe2a8;color:#754b00}.error{background:#fde8e8;border:1px solid #f6caca;color:#991b1b}.controls{display:flex;align-items:end;gap:10px;margin:12px 0;flex-wrap:wrap}.field{flex:1;min-width:150px}.field label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}.controls input,.controls select,.field select,.field input,.filter-row select{width:100%;padding:10px 11px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;background:#fff;color:#1f2937}.controls .btn{background:var(--blue);color:#fff;border-color:var(--blue);padding:10px 16px}.table-wrap{width:100%;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#fff}table{border-collapse:collapse;width:100%;min-width:720px;background:#fff}th,td{padding:9px 10px;text-align:left;vertical-align:middle;border-bottom:1px solid #e9edf2;font-size:13px}th{background:#eef4fa;color:#244d7b;white-space:nowrap}tbody tr:nth-child(even){background:#fafcff}tbody tr:last-child td{border-bottom:0}.num{text-align:center;font-variant-numeric:tabular-nums}.good,.paid{color:var(--green);font-weight:700}.pending,.due{color:var(--red);font-weight:700}.no-fee{color:var(--amber);font-weight:700}.total-row td{font-weight:700;background:#f2f6fa}.empty{text-align:center;color:var(--muted);padding:18px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:10px 0 16px}.student-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat{padding:12px;border-radius:10px;background:#f4f7fb;border:1px solid #e5ebf3}.stat .label{font-size:12px;color:var(--muted)}.stat .value{font-weight:700;font-size:23px;margin-top:5px;color:#243c58}.stat .value.good{color:var(--green)}.stat .value.pending{color:var(--red)}.teacher-line{padding:11px 12px;margin:12px 0;background:#f2f7fc;border:1px solid #dce8f5;border-radius:8px;font-size:14px}.fee-view{display:inline-block;text-decoration:none;padding:7px 10px;border-radius:7px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;white-space:nowrap}.pill{display:inline-block;padding:5px 8px;border-radius:18px;font-size:11px;font-weight:700}.pill.submitted,.pill.paid{background:#dcfce7;color:#166534}.pill.pending,.pill.due{background:#fee2e2;color:#991b1b}.pill.no-fee{background:#fff7d6;color:#854d0e}.filter-row{display:flex;gap:10px;align-items:center;margin:10px 0}.filter-row .field{max-width:260px}.right{text-align:right}
+@media(max-width:760px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:10px}.welcome,.panel{padding:13px}}
+@media(max-width:520px){header{padding:15px 10px}header h1{font-size:20px}.page-tools{align-items:flex-start;flex-wrap:wrap}.controls{display:block}.field{margin-bottom:9px}.controls .btn{width:100%}.stats{gap:8px}.stat .value{font-size:21px}.filter-row{display:block}.filter-row .field{max-width:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Shantiraman ERP</h1>
+  <div class="sub">Principal Dashboard</div>
+  <div class="school">{{ school_name }}</div>
+</header>
+<div class="wrap">
+  <section class="welcome">
+    <h2>Welcome, {{ principal_name }}</h2>
+    <div class="meta"><span><b>Designation:</b> {{ designation or 'Principal' }}</span><span><b>Role:</b> Principal</span><span><b>Active Session:</b> {{ session_name or 'Not available' }}</span></div>
+  </section>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  {% if view == 'home' %}
+    <h2 class="section-heading">Dashboard</h2>
+    <nav class="menu-grid" aria-label="Principal dashboard menu">
+      <a class="menu-card" href="{{ url_for('principal_dashboard', view='students') }}"><span class="menu-icon">🎓</span><span class="menu-label">Student Directory</span><span class="menu-note">{{ schoolwide_count }} active students</span></a>
+      <a class="menu-card" href="{{ url_for('principal_dashboard', view='exam') }}"><span class="menu-icon">📝</span><span class="menu-label">Result Posting</span><span class="menu-note">{{ posting_totals.submitted }} submitted / {{ posting_totals.total }} subjects</span></a>
+      <a class="menu-card" href="{{ url_for('principal_dashboard', view='attendance') }}"><span class="menu-icon">🗓️</span><span class="menu-label">Student Attendance</span><span class="menu-note">Class and section summary</span></a>
+      <a class="menu-card" href="{{ url_for('principal_dashboard', view='fees') }}"><span class="menu-icon">💰</span><span class="menu-label">Fee Report</span><span class="menu-note">Paid and due by class/section</span></a>
+      <a class="menu-card" href="{{ url_for('my_profile') }}"><span class="menu-icon">👤</span><span class="menu-label">My Profile</span><span class="menu-note">Personal information</span></a>
+    </nav>
+    <div class="logout-row"><a class="logout" href="{{ url_for('logout') }}">Logout</a></div>
+
+  {% elif view == 'students' %}
+    <div class="page-tools"><h2 class="page-title">Student Directory</h2><a class="back" href="{{ url_for('principal_dashboard') }}">Back to Dashboard</a></div>
+    <div class="stats student-stats">
+      <div class="stat"><div class="label">Total Students</div><div class="value">{{ schoolwide_count }}</div></div>
+      <div class="stat"><div class="label">Total Boys</div><div class="value">{{ schoolwide_boys if gender_counts_available else '—' }}</div></div>
+      <div class="stat"><div class="label">Total Girls</div><div class="value">{{ schoolwide_girls if gender_counts_available else '—' }}</div></div>
+    </div>
+    <section class="panel">
+      {% if report_warnings.get('teacher') %}<div class="warn">{{ report_warnings.get('teacher') }}</div>{% endif %}
+      {% if student_view_ready %}
+        <div class="page-tools"><h3 class="page-title">Class Student List</h3><a class="back" href="{{ url_for('principal_dashboard', view='students') }}">Back to Class List</a></div>
+        <div class="teacher-line"><b>Class:</b> {{ selected_class }} &nbsp; | &nbsp; <b>Section:</b> {{ selected_section }}<br><b>Class Teacher:</b> {{ selected_teacher_name or 'Not assigned' }}</div>
+        <div class="controls"><div class="field"><label for="studentSearch">Search Students</label><input type="search" id="studentSearch" placeholder="Search SR No., student name, father name or mobile" oninput="filterStudents()"></div></div>
+        <div class="table-wrap"><table id="studentsTable"><thead><tr><th>SL No.</th><th>SR No.</th><th>Student Name</th><th>Father Name</th><th>Date of Birth</th><th>Mobile No.</th></tr></thead><tbody>
+        {% for st in students %}<tr><td class="num">{{ loop.index }}</td><td>{{ st.srno or '—' }}</td><td>{{ st.name or '—' }}</td><td>{{ st.father or '—' }}</td><td>{{ st.dob or '—' }}</td><td>{{ st.mobile or '—' }}</td></tr>{% else %}<tr><td colspan="6" class="empty">No student records found for this class and section.</td></tr>{% endfor %}
+        </tbody></table></div>
+      {% else %}
+        <p class="note">Select View for a class and section to open its student list.</p>
+        <div class="table-wrap"><table id="studentClassSummary"><thead><tr><th>SL No.</th><th>Class</th><th>Section</th><th>No. of Students in Class</th><th>Teacher</th><th>View</th></tr></thead><tbody>
+        {% for item in pairs %}<tr><td class="num">{{ loop.index }}</td><td>{{ item.class_name }}</td><td>{{ item.section }}</td><td class="num">{{ item.count }}</td><td>{{ item.class_teacher or 'Not assigned' }}</td><td><a class="fee-view" href="{{ url_for('principal_dashboard', view='students', class_name=item.class_name, section=item.section) }}">View</a></td></tr>{% else %}<tr><td colspan="6" class="empty">No class/section student summary is available.</td></tr>{% endfor %}
+        </tbody></table></div>
+      {% endif %}
+    </section>
+
+  {% elif view == 'exam' %}
+    <div class="page-tools"><h2 class="page-title">Result Posting Report</h2><a class="back" href="{{ url_for('principal_dashboard') }}">Back to Dashboard</a></div>
+    {% if report_warnings.get('exam') %}<div class="warn">{{ report_warnings.get('exam') }}</div>{% endif %}
+    <section class="panel">
+      <form class="controls" method="get" action="{{ url_for('principal_dashboard') }}" id="examFilterForm">
+        <input type="hidden" name="view" value="exam">
+        <input type="hidden" name="exam_filter_applied" value="1">
+        <div class="field"><label for="exam_type">Exam Type</label><select id="exam_type" name="exam_type"><option value="All" {% if selected_exam_type == 'All' %}selected{% endif %}>All</option>{% for exam_type in exam_type_options %}<option value="{{ exam_type }}" {% if selected_exam_type == exam_type %}selected{% endif %}>{{ exam_type }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="exam_class">Class</label><select id="exam_class" name="exam_class" onchange="resetExamSections()"><option value="All" {% if selected_exam_class == 'All' %}selected{% endif %}>All</option>{% for class_name in exam_classes %}<option value="{{ class_name }}" {% if selected_exam_class == class_name %}selected{% endif %}>{{ class_name }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="exam_section">Section</label><select id="exam_section" name="exam_section" onchange="filterExamSections(true)"><option value="All" {% if selected_exam_section == 'All' %}selected{% endif %}>All</option>{% for item in exam_section_options %}<option value="{{ item.section }}" data-classes="|{{ item.classes|join('|') }}|" {% if selected_exam_section == item.section %}selected{% endif %}>{{ item.section }}</option>{% endfor %}</select></div>
+        <button class="btn" type="submit">View Report</button>
+        <a class="back" href="{{ url_for('principal_dashboard', view='exam') }}">Reset</a>
+      </form>
+      {% if not exam_filter_applied %}
+        <div class="empty">Select Exam Type, Class and Section, then click View Report.</div>
+      {% else %}
+        {% if exam_filter_ready %}<div class="teacher-line"><b>Class:</b> {{ selected_exam_class }} &nbsp; | &nbsp; <b>Section:</b> {{ selected_exam_section }}<br><b>Class Teacher:</b> {{ class_teacher_name_for_exam or '—' }}</div>{% endif %}
+        <div class="stats">
+          <div class="stat"><div class="label">Assigned Subjects / Papers</div><div class="value">{{ posting_totals.total }}</div></div>
+          <div class="stat"><div class="label">Submitted</div><div class="value good">{{ posting_totals.submitted }}</div></div>
+          <div class="stat"><div class="label">Pending</div><div class="value pending">{{ posting_totals.pending }}</div></div>
+          <div class="stat"><div class="label">Active Students</div><div class="value">{{ exam_students_count }}</div></div>
+        </div>
+        <h3>Class / Section Summary</h3>
+        <div class="table-wrap"><table><thead><tr><th>Class</th><th>Section</th><th>Exam Type</th><th>Total Subjects</th><th>Submitted</th><th>Pending</th><th>View</th></tr></thead><tbody>
+        {% for r in exam_report %}<tr><td>{{ r.class_name }}</td><td>{{ r.section }}</td><td>{{ r.exam }}</td><td class="num">{{ r.total_subjects }}</td><td class="num good">{{ r.completed }}</td><td class="num pending">{{ r.pending }}</td><td><a class="fee-view" href="{{ url_for('principal_dashboard', view='exam', exam_filter_applied='1', exam_class=r.class_name, exam_section=r.section, exam_type=r.exam) }}">View</a></td></tr>{% else %}<tr><td colspan="7" class="empty">No result posting assignments match the selected filters.</td></tr>{% endfor %}
+        {% if exam_report %}<tr class="total-row"><td colspan="3">Total</td><td class="num">{{ exam_totals.total }}</td><td class="num good">{{ exam_totals.completed }}</td><td class="num pending">{{ exam_totals.pending }}</td><td></td></tr>{% endif %}
+        </tbody></table></div>
+      {% endif %}
+    </section>
+
+  {% elif view == 'attendance' %}
+    <div class="page-tools"><h2 class="page-title">Student Attendance Report</h2><a class="back" href="{{ url_for('principal_dashboard') }}">Back to Dashboard</a></div>
+    <section class="panel">
+      <div class="meta" style="margin-bottom:12px"><span><b>Latest Attendance Date:</b> {{ attendance_date or 'No attendance recorded' }}</span></div>
+      {% if report_warnings.get('attendance') %}<div class="warn">{{ report_warnings.get('attendance') }}</div>{% endif %}
+      <div class="table-wrap"><table><thead><tr><th>Class</th><th>Section</th><th>Class Teacher</th><th>Total Students</th><th>Attendance Saved</th><th>Not Saved</th><th>View</th></tr></thead><tbody>
+      {% for r in attendance_report %}<tr><td>{{ r.class_name }}</td><td>{{ r.section }}</td><td>{{ r.class_teacher or '—' }}</td><td class="num">{{ r.total_students }}</td><td class="num good">{{ r.submitted }}</td><td class="num pending">{{ r.pending }}</td><td><a class="fee-view" href="{{ url_for('principal_dashboard', view='attendance-details', class_name=r.class_name, section=r.section) }}">View</a></td></tr>{% else %}<tr><td colspan="7" class="empty">No attendance summary is available.</td></tr>{% endfor %}
+      {% if attendance_report %}<tr class="total-row"><td colspan="3">Total</td><td class="num">{{ attendance_totals.total }}</td><td class="num good">{{ attendance_totals.submitted }}</td><td class="num pending">{{ attendance_totals.pending }}</td><td></td></tr>{% endif %}
+      </tbody></table></div>
+    </section>
+
+  {% elif view == 'attendance-details' %}
+    <div class="page-tools"><h2 class="page-title">Class Attendance Details</h2><a class="back" href="{{ url_for('principal_dashboard', view='attendance') }}">Back to Attendance Report</a></div>
+    {% if report_warnings.get('attendance_detail') %}<div class="warn">{{ report_warnings.get('attendance_detail') }}</div>{% endif %}
+    <section class="panel">
+      <div class="teacher-line"><b>Class:</b> {{ selected_class }} &nbsp; | &nbsp; <b>Section:</b> {{ selected_section }}<br><b>Class Teacher:</b> {{ selected_teacher_name or 'Not assigned' }}<br><b>Attendance Date:</b> {{ attendance_detail_date or 'No attendance recorded' }}</div>
+      <div class="stats">
+        <div class="stat"><div class="label">Total Students</div><div class="value">{{ attendance_detail_totals.total }}</div></div>
+        <div class="stat"><div class="label">Present</div><div class="value good">{{ attendance_detail_totals.present }}</div></div>
+        <div class="stat"><div class="label">Absent</div><div class="value pending">{{ attendance_detail_totals.absent }}</div></div>
+        <div class="stat"><div class="label">Medical</div><div class="value">{{ attendance_detail_totals.medical }}</div></div>
+      </div>
+      <div class="meta" style="margin-bottom:12px"><span><b>Not Saved:</b> {{ attendance_detail_totals.not_saved }}</span></div>
+      <div class="table-wrap"><table id="attendanceDetailsTable"><thead><tr><th>SL No.</th><th>SR No.</th><th>Student Name</th><th>Father Name</th><th>Mobile No.</th><th>Attendance Status</th></tr></thead><tbody>
+      {% for st in attendance_detail_students %}<tr><td class="num">{{ loop.index }}</td><td>{{ st.srno or '—' }}</td><td>{{ st.name or '—' }}</td><td>{{ st.father or '—' }}</td><td>{{ st.mobile or '—' }}</td><td class="{{ st.status_class }}">{{ st.status }}</td></tr>{% else %}<tr><td colspan="6" class="empty">No student attendance records are available for this class and section.</td></tr>{% endfor %}
+      </tbody></table></div>
+    </section>
+
+  {% elif view == 'fees' %}
+    <div class="page-tools"><h2 class="page-title">Fee Report</h2><a class="back" href="{{ url_for('principal_dashboard') }}">Back to Dashboard</a></div>
+    {% if report_warnings.get('fee') %}<div class="warn">{{ report_warnings.get('fee') }}</div>{% endif %}
+    <section class="panel">
+      <div class="stats">
+        <div class="stat"><div class="label">Students</div><div class="value">{{ fee_totals.total }}</div></div>
+        <div class="stat"><div class="label">Paid</div><div class="value good">{{ fee_totals.paid }}</div></div>
+        <div class="stat"><div class="label">Students With Due</div><div class="value pending">{{ fee_totals.due }}</div></div>
+        <div class="stat"><div class="label">Total Balance</div><div class="value pending">{{ fee_totals.balance_display }}</div></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Class</th><th>Section</th><th>Class Teacher</th><th>Total Students</th><th>Paid</th><th>Students With Due</th><th>No Fee Setup</th><th>Total Fee</th><th>Fee Collected</th><th>View</th></tr></thead><tbody>
+      {% for r in fee_report %}<tr><td>{{ r.class_name }}</td><td>{{ r.section }}</td><td>{{ r.class_teacher or '—' }}</td><td class="num">{{ r.total_students }}</td><td class="num good">{{ r.paid }}</td><td class="num pending">{{ r.due }}</td><td class="num">{{ r.no_fee_setup }}</td><td>{{ r.total_fee_display }}</td><td>{{ r.collected_display }}</td><td><a class="fee-view" href="{{ url_for('principal_dashboard', view='fee-details', class_name=r.class_name, section=r.section) }}">View</a></td></tr>{% else %}<tr><td colspan="10" class="empty">No fee summary is available.</td></tr>{% endfor %}
+      {% if fee_report %}<tr class="total-row"><td colspan="3">Total</td><td class="num">{{ fee_totals.total }}</td><td class="num good">{{ fee_totals.paid }}</td><td class="num pending">{{ fee_totals.due }}</td><td class="num">{{ fee_totals.no_fee_setup }}</td><td>{{ fee_totals.total_fee_display }}</td><td>{{ fee_totals.collected_display }}</td><td></td></tr>{% endif %}
+      </tbody></table></div>
+    </section>
+
+  {% elif view == 'fee-details' %}
+    <div class="page-tools"><h2 class="page-title">Class Fee Details</h2><a class="back" href="{{ url_for('principal_dashboard', view='fees') }}">Back to Fee Report</a></div>
+    {% if report_warnings.get('fee_detail') %}<div class="warn">{{ report_warnings.get('fee_detail') }}</div>{% endif %}
+    <section class="panel">
+      <div class="teacher-line"><b>Class:</b> {{ selected_class }} &nbsp; | &nbsp; <b>Section:</b> {{ selected_section }}<br><b>Class Teacher:</b> {{ selected_teacher_name or 'Not assigned' }}</div>
+      <div class="stats">
+        <div class="stat"><div class="label">Students</div><div class="value">{{ fee_detail_totals.students }}</div></div>
+        <div class="stat"><div class="label">Students With Due</div><div class="value pending">{{ fee_detail_totals.due }}</div></div>
+        <div class="stat"><div class="label">Total Outstanding Balance</div><div class="value pending">{{ fee_detail_totals.balance_display }}</div></div>
+        <div class="stat"><div class="label">Class Teacher</div><div class="value" style="font-size:15px">{{ selected_teacher_name or 'Not assigned' }}</div></div>
+      </div>
+      <div class="filter-row"><div class="field"><label for="feeStatusFilter">Status</label><select id="feeStatusFilter" onchange="filterFeeRows()"><option value="Due">Due Only</option><option value="All">All Students</option><option value="Paid">Paid</option><option value="No Fee Setup">No Fee Setup</option></select></div><div class="field"><label for="feeSearch">Search</label><input id="feeSearch" type="search" placeholder="Search SR No., student or father name" oninput="filterFeeRows()"></div></div>
+      <div class="table-wrap"><table id="feeDetailsTable"><thead><tr><th>SL No.</th><th>SR No.</th><th>Student Name</th><th>Father Name</th><th>Total Fee</th><th>Fee Collected</th><th>Balance</th><th>Status</th><th>View</th></tr></thead><tbody>
+      {% for st in fee_detail_students %}<tr data-status="{{ st.status }}"><td class="num">{{ loop.index }}</td><td>{{ st.srno or '—' }}</td><td>{{ st.name or '—' }}</td><td>{{ st.father or '—' }}</td><td>{{ st.total_fee_display }}</td><td>{{ st.total_paid_display }}</td><td class="{% if st.status == 'Due' %}pending{% else %}good{% endif %}">{{ st.balance_display }}</td><td><span class="pill {{ st.status_class }}">{{ st.status }}</span></td><td><a class="fee-view" href="{{ url_for('principal_dashboard', view='fee-student-details', class_name=selected_class, section=selected_section, student_id=st.id) }}">View</a></td></tr>{% else %}<tr><td colspan="9" class="empty">No student fee records are available.</td></tr>{% endfor %}
+      </tbody></table></div>
+    </section>
+
+  {% elif view == 'fee-student-details' %}
+    <div class="page-tools"><h2 class="page-title">Student Fee Details</h2><a class="back" href="{{ url_for('principal_dashboard', view='fee-details', class_name=selected_class, section=selected_section) }}">Back to Class Fee Details</a></div>
+    {% if report_warnings.get('fee_detail') %}<div class="warn">{{ report_warnings.get('fee_detail') }}</div>{% endif %}
+    {% if fee_student_detail %}
+      <section class="panel">
+        <div class="teacher-line"><b>Class:</b> {{ selected_class }} &nbsp; | &nbsp; <b>Section:</b> {{ selected_section }}<br><b>Class Teacher:</b> {{ selected_teacher_name or 'Not assigned' }}</div>
+        <h3>{{ fee_student_detail.name or 'Student' }}</h3>
+        <div class="meta"><span><b>SR No.:</b> {{ fee_student_detail.srno or '—' }}</span><span><b>Father Name:</b> {{ fee_student_detail.father or '—' }}</span></div>
+        <div class="stats">
+          <div class="stat"><div class="label">Total Fee</div><div class="value">{{ fee_student_detail.total_fee_display }}</div></div>
+          <div class="stat"><div class="label">Fee Collected</div><div class="value good">{{ fee_student_detail.total_paid_display }}</div></div>
+          <div class="stat"><div class="label">Balance</div><div class="value pending">{{ fee_student_detail.balance_display }}</div></div>
+          <div class="stat"><div class="label">Status</div><div class="value" style="font-size:16px"><span class="pill {{ fee_student_detail.status_class }}">{{ fee_student_detail.status }}</span></div></div>
+        </div>
+      </section>
+      <section class="panel"><h3>Month Wise Fee</h3><div class="table-wrap"><table><thead><tr><th>SL No.</th><th>Month</th><th>Fee</th><th>Fee Collected</th><th>Balance</th></tr></thead><tbody>
+        {% for m in fee_student_detail.monthly %}<tr><td class="num">{{ loop.index }}</td><td>{{ m.month }}</td><td>{{ '₹ %.2f'|format(m.fee) }}</td><td class="good">{{ '₹ %.2f'|format(m.paid) }}</td><td class="{% if m.balance > 0 %}pending{% else %}good{% endif %}">{{ '₹ %.2f'|format(m.balance) }}</td></tr>{% else %}<tr><td colspan="5" class="empty">No month-wise fee setup or receipt records are available.</td></tr>{% endfor %}
+      </tbody></table></div></section>
+    {% endif %}
+  {% else %}
+    <section class="panel"><div class="empty">This report is not available.</div></section>
+  {% endif %}
+
+  {% if view != 'home' %}<div class="bottom-actions"><a class="back" href="{{ url_for('my_profile') }}">My Profile</a> <a class="back" href="{{ url_for('principal_dashboard') }}">Dashboard</a></div><div class="logout-row"><a class="logout" href="{{ url_for('logout') }}">Logout</a></div>{% endif %}
+</div>
+<script>
+function resetSections(){resetPairSections('class_name','section');}
+function resetPairSections(classId,sectionId){const classSelect=document.getElementById(classId);const sectionSelect=document.getElementById(sectionId);if(!classSelect||!sectionSelect)return;sectionSelect.value='';filterPairSections(classId,sectionId,false);}
+function filterPairSections(classId,sectionId,keepSelection){const classSelect=document.getElementById(classId);const sectionSelect=document.getElementById(sectionId);if(!classSelect||!sectionSelect)return;const c=classSelect.value;Array.from(sectionSelect.options).forEach((opt,index)=>{if(index===0){opt.hidden=false;return;}const visible=Boolean(c)&&opt.dataset.class===c;opt.hidden=!visible;if(!visible&&opt.selected)sectionSelect.value='';});if(!keepSelection)sectionSelect.value='';}
+function filterSections(keepSelection){filterPairSections('class_name','section',keepSelection);}
+function filterStudents(){const input=document.getElementById('studentSearch');if(!input)return;const q=(input.value||'').toLocaleLowerCase().trim();document.querySelectorAll('#studentsTable tbody tr').forEach(row=>{row.style.display=row.innerText.toLocaleLowerCase().includes(q)?'':'none';});}
+function filterFeeRows(){const status=document.getElementById('feeStatusFilter');const search=document.getElementById('feeSearch');const s=status?status.value:'Due';const q=(search?search.value:'').toLocaleLowerCase().trim();document.querySelectorAll('#feeDetailsTable tbody tr[data-status]').forEach(row=>{const statusMatch=s==='All'||row.dataset.status===s;const searchMatch=!q||row.innerText.toLocaleLowerCase().includes(q);row.style.display=statusMatch&&searchMatch?'':'none';});}
+function resetExamSections(){const section=document.getElementById('exam_section');if(section)section.value='All';filterExamSections(false);}
+function filterExamSections(keepSelection){const cls=document.getElementById('exam_class');const sec=document.getElementById('exam_section');if(!cls||!sec)return;const c=cls.value||'All';let selectionAllowed=false;Array.from(sec.options).forEach((opt,index)=>{if(opt.value==='All'){opt.hidden=false;return;}const memberships=opt.dataset.classes||'';const visible=c==='All'||memberships.includes('|'+c+'|');opt.hidden=!visible;if(opt.value===sec.value&&visible)selectionAllowed=true;});if(!keepSelection||!selectionAllowed)sec.value='All';}
+document.addEventListener('DOMContentLoaded',function(){filterSections(true);filterExamSections(true);filterFeeRows();});
+</script>
+</body>
+</html>
