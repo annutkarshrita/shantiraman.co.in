@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- MY_RESULT_STATUS_COLORS_PATCH_V4 -->
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
@@ -25,10 +26,15 @@ button{background:#28558c;color:#fff;border:0;font-weight:bold;cursor:pointer}
 table{border-collapse:collapse;width:100%;min-width:1000px;background:#fff}
 th,td{padding:9px 10px;border-bottom:1px solid #e5e7eb;text-align:left;white-space:nowrap}
 th{background:#eaf0f7;color:#1e3a5f}
-.pending{color:#b45309;font-weight:bold}
+.pending{color:#991b1b;font-weight:bold}
 .pass{color:#166534;font-weight:bold}
+.complete{color:#166534;font-weight:bold}
 .fail{color:#991b1b;font-weight:bold}
 .special{color:#7c2d12;font-weight:bold}
+.entry-status-badge{display:inline-block;min-width:92px;padding:6px 11px;border-radius:999px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.25px;border:1px solid transparent}
+.entry-status-complete{background:#dcfce7 !important;color:#166534 !important;border-color:#86efac !important}
+.entry-status-partial{background:#fef3c7 !important;color:#92400e !important;border-color:#fcd34d !important}
+.entry-status-pending{background:#fee2e2 !important;color:#991b1b !important;border-color:#fca5a5 !important}
 small{color:#64748b}
 </style>
 </head>
@@ -98,7 +104,8 @@ small{color:#64748b}
           <th>Total M.M.</th>
           <th>Total Obt.</th>
           <th>Percentage</th>
-          <th>Status</th>
+          <th>Entry Status</th>
+          <th>Result</th>
         </tr>
       </thead>
       <tbody>
@@ -112,8 +119,16 @@ small{color:#64748b}
             <td>{{ r.total_max }}</td>
             <td>{{ r.total_obt }}</td>
             <td>{{ r.percentage or '—' }}</td>
-            <td class="{% if r.status=='PASS' %}pass{% elif r.status=='FAIL' %}fail{% elif r.status in ('ABSENT','MEDICAL') %}special{% else %}pending{% endif %}">
-              {{ r.status }}
+            {% set entry_status = (r.entry_status|default(r.status|default('PENDING', true), true)|string|trim|upper) %}
+            <td class="entry-status-cell"
+                style="padding:9px 10px;{% if entry_status == 'COMPLETE' %}background-color:#dcfce7 !important;color:#166534 !important;{% elif entry_status == 'PARTIAL' %}background-color:#fef3c7 !important;color:#92400e !important;{% else %}background-color:#fee2e2 !important;color:#991b1b !important;{% endif %}">
+              <span class="entry-status-badge"
+                style="display:inline-block;min-width:92px;padding:6px 11px;border-radius:999px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.25px;border:1px solid transparent;{% if entry_status == 'COMPLETE' %}background:#dcfce7 !important;color:#166534 !important;border-color:#86efac !important;{% elif entry_status == 'PARTIAL' %}background:#fef3c7 !important;color:#92400e !important;border-color:#fcd34d !important;{% else %}background:#fee2e2 !important;color:#991b1b !important;border-color:#fca5a5 !important;{% endif %}">
+                {{ entry_status }}
+              </span>
+            </td>
+            <td class="{% if r.result_status == 'PASS' %}pass{% elif r.result_status == 'FAIL' %}fail{% elif r.result_status in ('ABSENT','MEDICAL','A','M') %}special{% else %}pending{% endif %}">
+              {{ r.result_status }}
             </td>
           </tr>
           {% endfor %}
