@@ -26,6 +26,9 @@ td{font-size:14px}
 tbody tr:hover{background:#f8fafc}
 .dob{white-space:nowrap;font-size:13px;color:#334155}
 select{width:100%;min-width:180px;padding:9px 8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:14px}
+.subject-pickers{display:grid;grid-template-columns:minmax(180px,1fr);gap:6px;min-width:205px}
+.subject-picker-label{display:block;font-size:11px;font-weight:bold;color:#64748b;margin-bottom:2px}
+select option:disabled{color:#94a3b8}
 .btn{display:inline-block;border:0;border-radius:9px;padding:9px 13px;font-weight:bold;text-decoration:none;cursor:pointer;text-align:center;font-size:13px}
 .view{background:#e6efff;color:#173b6d;white-space:nowrap}
 .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:13px}
@@ -65,28 +68,38 @@ select{width:100%;min-width:180px;padding:9px 8px;border:1px solid #cbd5e1;borde
               <th>Student Name</th>
               <th>Father's Name</th>
               <th>DOB</th>
-              <th>Optional Subject</th>
+              <th>Optional Subjects</th>
               <th>View</th>
             </tr>
           </thead>
           <tbody>
           {% for x in students %}
-            {% set current_subject = assigned_subjects.get(x.id, '') %}
+            {% set current_subjects = assigned_subjects.get(x.id, []) %}
             <tr>
               <td>{{ x.srno or '-' }}</td>
               <td><b>{{ x.name or '-' }}</b></td>
               <td>{{ x.father or '-' }}</td>
               <td class="dob">{{ x.dob_display or '-' }}</td>
               <td>
-                <select name="optional_subject_{{ x.id }}" aria-label="{{ x.name }} का Optional Subject">
-                  <option value="">-- Subject चुनें --</option>
-                  {% if current_subject and current_subject not in optional_subjects %}
-                    <option value="{{ current_subject }}" selected>{{ current_subject }} (पहले से assigned)</option>
-                  {% endif %}
-                  {% for subject in optional_subjects %}
-                    <option value="{{ subject }}" {% if current_subject == subject %}selected{% endif %}>{{ subject }}</option>
+                <div class="subject-pickers" data-optional-picker-group>
+                  {% for slot in range(optional_slots) %}
+                    {% set current_subject = current_subjects[slot] if slot < current_subjects|length else '' %}
+                    <div>
+                      {% if optional_slots > 1 %}<label class="subject-picker-label">Optional Subject {{ slot + 1 }}</label>{% endif %}
+                      <select name="optional_subject_{{ x.id }}_{{ slot + 1 }}"
+                              aria-label="{{ x.name }} Optional Subject {{ slot + 1 }}"
+                              data-optional-subject-select>
+                        <option value="">-- Not Assigned --</option>
+                        {% if current_subject and current_subject not in optional_subjects %}
+                          <option value="{{ current_subject }}" selected>{{ current_subject }} (existing)</option>
+                        {% endif %}
+                        {% for subject in optional_subjects %}
+                          <option value="{{ subject }}" {% if current_subject == subject %}selected{% endif %}>{{ subject }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
                   {% endfor %}
-                </select>
+                </div>
               </td>
               <td><a class="btn view" href="{{ url_for('my_student_detail', student_id=x.id) }}">View</a></td>
             </tr>
@@ -95,7 +108,7 @@ select{width:100%;min-width:180px;padding:9px 8px;border:1px solid #cbd5e1;borde
         </table>
       </div>
       <div class="actions">
-        <span class="hint">एक-एक विद्यार्थी का विषय चुनें, फिर नीचे का बटन केवल एक बार दबाएँ। खाली छोड़ी गई पंक्ति का पुराना assignment नहीं हटेगा।</span>
+        <span class="hint">Select up to {{ optional_slots }} distinct Optional Subject(s) per student. A subject already selected for that student will be hidden in the other selectors. The same subject can be assigned to different students.</span>
         <button class="btn save" type="submit">Assign All Optional Subjects</button>
       </div>
       {% else %}
@@ -104,5 +117,32 @@ select{width:100%;min-width:180px;padding:9px 8px;border:1px solid #cbd5e1;borde
     </div>
   </form>
 </div>
+<script>
+(function () {
+  function syncOptionalPickers(group) {
+    const selects = Array.from(group.querySelectorAll('select[data-optional-subject-select]'));
+    const chosenValues = selects.map(s => (s.value || '').trim().toLocaleLowerCase());
+    selects.forEach((select, selectIndex) => {
+      const currentValue = (select.value || '').trim().toLocaleLowerCase();
+      const usedByOtherSelects = new Set(
+        chosenValues.filter((value, index) => value && index !== selectIndex)
+      );
+      Array.from(select.options).forEach(option => {
+        const key = (option.value || '').trim().toLocaleLowerCase();
+        if (!key) return;
+        const duplicateElsewhere = usedByOtherSelects.has(key) && key !== currentValue;
+        option.hidden = duplicateElsewhere;
+        option.disabled = duplicateElsewhere;
+      });
+    });
+  }
+
+  document.querySelectorAll('[data-optional-picker-group]').forEach(group => {
+    const selects = Array.from(group.querySelectorAll('select[data-optional-subject-select]'));
+    selects.forEach(select => select.addEventListener('change', () => syncOptionalPickers(group)));
+    syncOptionalPickers(group);
+  });
+})();
+</script>
 </body>
 </html>
