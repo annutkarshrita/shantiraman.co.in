@@ -17,6 +17,7 @@ body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#f1
 .message{padding:11px 13px;border-radius:9px;margin-bottom:12px;white-space:pre-line}
 .error{background:#fee2e2;color:#991b1b}
 .success{background:#dcfce7;color:#166534}
+.warning{background:#fef3c7;color:#92400e}
 .card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 10px #0000000a}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:820px}
@@ -51,15 +52,22 @@ select option:disabled{color:#94a3b8}
     <span class="pill"><b>Section:</b> {{ section or '-' }}</span>
     <span class="pill"><b>Session:</b> {{ session_name or '-' }}</span>
     <span class="pill"><b>Total Students:</b> {{ students|length }}</span>
+    <span class="pill"><b>Optional Subjects per Student:</b> {{ optional_slots }}</span>
+    <span class="pill"><b>Available Optional Subjects:</b> {{ optional_subjects|length }}</span>
   </div>
 
   {% if error %}<div class="message error">{{ error }}</div>{% endif %}
   {% if success %}<div class="message success">{{ success }}</div>{% endif %}
+  {% if optional_slots > 0 and optional_subjects|length < optional_slots %}
+  <div class="message warning">Exam Setup में प्रति विद्यार्थी {{ optional_slots }} Optional Subject निर्धारित हैं, लेकिन इस Class/Section में केवल {{ optional_subjects|length }} अलग-अलग Optional Subject उपलब्ध हैं. तीन अलग विषय चुनने के लिए Exam Setup में कम-से-कम {{ optional_slots }} विषयों को Opt. No. {{ optional_slots }} के साथ Optional बनाकर Save/Update करें.</div>
+  {% endif %}
 
   <form method="post" action="{{ url_for('my_students') }}">
     <input type="hidden" name="action" value="assign_all">
     <div class="card">
-      {% if students %}
+      {% if optional_slots <= 0 %}
+      <div class="empty">इस Class + Section के लिए Optional Subject की संख्या सेट नहीं है। Desktop Exam Setup में Opt. No. में 1 या उससे अधिक संख्या Optional विषय के लिए भरकर Save करें। सामान्य विषय के लिए 0 रखें।</div>
+      {% elif students %}
       <div class="table-wrap">
         <table>
           <thead>
