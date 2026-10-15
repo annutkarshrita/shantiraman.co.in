@@ -331,7 +331,11 @@ def my_students():
 
         if sid and not assigned_subjects:
             assigned_subjects = _load_optional_assignments(cur, sid, class_name, section)
-        for student in students:
+
+        # Display-only serial number for the current My Students roster.
+        # Student IDs, SR numbers, and database records are not modified.
+        for sl_no, student in enumerate(students, start=1):
+            student["sl_no"] = sl_no
             student["dob_display"] = _format_dob(student.get("dob"))
 
     except Exception as e:
@@ -355,6 +359,7 @@ def my_students():
         section=section,
         session_name=sname,
         students=students,
+        student_count=len(students),
         optional_subjects=optional_subjects,
         assigned_subjects=assigned_subjects,
         optional_slots=optional_slots,
@@ -407,4 +412,3 @@ def my_student_detail(student_id):
         details=detail,
         error=error
     )
-
