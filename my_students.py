@@ -1,370 +1,156 @@
-from app import app, get_school_name
-from flask import render_template, redirect, url_for, session, request
-from datetime import datetime
-from class_teacher_common import (
-    require_class_teacher, _class_students, _clean_value,
-    _student_columns, _table_columns, _pick_col, get_connection
-)
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Students - Optional Subject Assignment</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#f1f5f9;color:#172033}
+.top{background:#173b6d;color:#fff;padding:15px 18px}
+.top h2{margin:0 0 5px;font-size:21px}
+.top .school{font-size:14px;opacity:.95}
+.wrap{max-width:1250px;margin:auto;padding:14px}
+.back{display:inline-block;margin:0 0 12px;text-decoration:none;color:#173b6d;font-weight:bold}
+.info{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 9px #0000000a;display:flex;flex-wrap:wrap;gap:8px 20px}
+.pill{background:#eaf1fb;border-radius:20px;padding:6px 10px;font-size:13px}
+.message{padding:11px 13px;border-radius:9px;margin-bottom:12px;white-space:pre-line}
+.error{background:#fee2e2;color:#991b1b}
+.success{background:#dcfce7;color:#166534}
+.warning{background:#fef3c7;color:#92400e}
+.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 10px #0000000a}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th,td{padding:8px 9px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:middle}
+th{background:#edf2f8;color:#243650;font-size:13px;white-space:nowrap}
+td{font-size:14px}
+tbody tr:hover{background:#f8fafc}
+.dob{white-space:nowrap;font-size:13px;color:#334155}
+select{width:100%;min-width:180px;padding:9px 8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:14px}
+.subject-pickers{display:grid;grid-template-columns:minmax(180px,1fr);gap:6px;min-width:205px}
+.subject-picker-label{display:block;font-size:11px;font-weight:bold;color:#64748b;margin-bottom:2px}
+select option:disabled{color:#94a3b8}
+.btn{display:inline-block;border:0;border-radius:9px;padding:9px 13px;font-weight:bold;text-decoration:none;cursor:pointer;text-align:center;font-size:13px}
+.view{background:#e6efff;color:#173b6d;white-space:nowrap}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:13px}
+.save{background:#173b6d;color:#fff;font-size:15px;padding:12px 18px}
+.hint{font-size:12px;color:#64748b;line-height:1.45}
+.empty{text-align:center;padding:22px;color:#64748b}
+@media(max-width:650px){.wrap{padding:9px}.top{padding:13px}.top h2{font-size:19px}.info{gap:6px}.card{padding:7px}th,td{padding:7px}select{min-width:165px}.save{width:100%}.actions{align-items:stretch}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h2>My Students</h2>
+  <div class="school">{{ school_name }}</div>
+</div>
+<div class="wrap">
+  <a class="back" href="{{ url_for('teacher_dashboard') }}">← Dashboard</a>
 
+  <div class="info">
+    <span class="pill"><b>Class:</b> {{ class_name or '-' }}</span>
+    <span class="pill"><b>Section:</b> {{ section or '-' }}</span>
+    <span class="pill"><b>Session:</b> {{ session_name or '-' }}</span>
+    <span class="pill"><b>Total Students:</b> {{ students|length }}</span>
+    <span class="pill"><b>Optional Subjects per Student:</b> {{ optional_slots }}</span>
+    <span class="pill"><b>Available Optional Subjects:</b> {{ optional_subjects|length }}</span>
+  </div>
 
-OPTIONAL_ASSIGNMENT_TABLE_SQL = """
-IF OBJECT_ID(N'dbo.StudentOptionalSubject', N'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.StudentOptionalSubject
-    (
-        ID BIGINT IDENTITY(1,1) NOT NULL
-            CONSTRAINT PK_StudentOptionalSubject PRIMARY KEY,
-        SessionID NVARCHAR(100) NOT NULL,
-        SessionName NVARCHAR(100) NULL,
-        StudentID NVARCHAR(100) NOT NULL,
-        ClassName NVARCHAR(100) NOT NULL,
-        SectionName NVARCHAR(100) NOT NULL,
-        SubjectName NVARCHAR(255) NOT NULL,
-        AssignedBy NVARCHAR(255) NULL,
-        AssignedAt DATETIME2(0) NOT NULL
-            CONSTRAINT DF_StudentOptionalSubject_AssignedAt DEFAULT (SYSDATETIME())
-    );
-END;
+  {% if error %}<div class="message error">{{ error }}</div>{% endif %}
+  {% if success %}<div class="message success">{{ success }}</div>{% endif %}
+  {% if optional_slots > 0 and optional_subjects|length < optional_slots %}
+  <div class="message warning">Exam Setup में प्रति विद्यार्थी {{ optional_slots }} Optional Subject निर्धारित हैं, लेकिन इस Class/Section में केवल {{ optional_subjects|length }} अलग-अलग Optional Subject उपलब्ध हैं. तीन अलग विषय चुनने के लिए Exam Setup में कम-से-कम {{ optional_slots }} विषयों को Opt. No. {{ optional_slots }} के साथ Optional बनाकर Save/Update करें.</div>
+  {% endif %}
 
--- Earlier design allowed only one optional subject per student.
--- Remove that restriction so Classes XI/XII can keep up to three subjects.
-IF EXISTS
-(
-    SELECT 1
-    FROM sys.key_constraints
-    WHERE parent_object_id = OBJECT_ID(N'dbo.StudentOptionalSubject')
-      AND name = N'UQ_StudentOptionalSubject_Session_Student'
-      AND type = 'UQ'
-)
-BEGIN
-    ALTER TABLE dbo.StudentOptionalSubject
-    DROP CONSTRAINT UQ_StudentOptionalSubject_Session_Student;
-END;
+  <form method="post" action="{{ url_for('my_students') }}">
+    <input type="hidden" name="action" value="assign_all">
+    <div class="card">
+      {% if optional_slots <= 0 %}
+      <div class="empty">इस Class + Section के लिए Optional Subject की संख्या सेट नहीं है। Desktop Exam Setup में Opt. No. में 1 या उससे अधिक संख्या Optional विषय के लिए भरकर Save करें। सामान्य विषय के लिए 0 रखें।</div>
+      {% elif students %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sr No</th>
+              <th>Student Name</th>
+              <th>Father's Name</th>
+              <th>DOB</th>
+              <th>Optional Subjects</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for x in students %}
+            {% set current_subjects = assigned_subjects.get(x.id, []) %}
+            <tr>
+              <td>{{ x.srno or '-' }}</td>
+              <td><b>{{ x.name or '-' }}</b></td>
+              <td>{{ x.father or '-' }}</td>
+              <td class="dob">{{ x.dob_display or '-' }}</td>
+              <td>
+                <div class="subject-pickers" data-optional-picker-group>
+                  {% for slot in range(optional_slots) %}
+                    {% set current_subject = current_subjects[slot] if slot < current_subjects|length else '' %}
+                    <div>
+                      {% if optional_slots > 1 %}<label class="subject-picker-label">Optional Subject {{ slot + 1 }}</label>{% endif %}
+                      <select name="optional_subject_{{ x.id }}_{{ slot + 1 }}"
+                              aria-label="{{ x.name }} Optional Subject {{ slot + 1 }}"
+                              data-optional-subject-select>
+                        <option value="">-- Not Assigned --</option>
+                        {% if current_subject and current_subject not in optional_subjects %}
+                          <option value="{{ current_subject }}" selected>{{ current_subject }} (existing)</option>
+                        {% endif %}
+                        {% for subject in optional_subjects %}
+                          <option value="{{ subject }}" {% if current_subject == subject %}selected{% endif %}>{{ subject }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endfor %}
+                </div>
+              </td>
+              <td><a class="btn view" href="{{ url_for('my_student_detail', student_id=x.id) }}">View</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <span class="hint">Select up to {{ optional_slots }} distinct Optional Subject(s) per student. A subject already selected for that student will be hidden in the other selectors. The same subject can be assigned to different students.</span>
+        <button class="btn save" type="submit">Assign All Optional Subjects</button>
+      </div>
+      {% else %}
+      <div class="empty">इस Class/Section में कोई Active Student नहीं मिला।</div>
+      {% endif %}
+    </div>
+  </form>
+</div>
+<script>
+(function () {
+  function syncOptionalPickers(group) {
+    const selects = Array.from(group.querySelectorAll('select[data-optional-subject-select]'));
+    const chosenValues = selects.map(s => (s.value || '').trim().toLocaleLowerCase());
+    selects.forEach((select, selectIndex) => {
+      const currentValue = (select.value || '').trim().toLocaleLowerCase();
+      const usedByOtherSelects = new Set(
+        chosenValues.filter((value, index) => value && index !== selectIndex)
+      );
+      Array.from(select.options).forEach(option => {
+        const key = (option.value || '').trim().toLocaleLowerCase();
+        if (!key) return;
+        const duplicateElsewhere = usedByOtherSelects.has(key) && key !== currentValue;
+        option.hidden = duplicateElsewhere;
+        option.disabled = duplicateElsewhere;
+      });
+    });
+  }
 
-IF NOT EXISTS
-(
-    SELECT 1 FROM sys.indexes
-    WHERE object_id = OBJECT_ID(N'dbo.StudentOptionalSubject')
-      AND name = N'IX_StudentOptionalSubject_Session_Student'
-)
-BEGIN
-    CREATE INDEX IX_StudentOptionalSubject_Session_Student
-    ON dbo.StudentOptionalSubject (SessionID, StudentID);
-END;
-"""
-
-
-def _format_dob(value):
-    """DOB को छोटा dd-mm-yyyy फ़ॉर्मेट में दिखाएँ; stored value नहीं बदलते।"""
-    if value is None:
-        return "—"
-    if hasattr(value, "strftime"):
-        try:
-            return value.strftime("%d-%m-%Y")
-        except Exception:
-            pass
-    text_value = str(value).strip()
-    if not text_value:
-        return "—"
-    try:
-        return datetime.fromisoformat(text_value.replace("Z", "+00:00")).strftime("%d-%m-%Y")
-    except (ValueError, TypeError):
-        pass
-    # SQL Server datetime strings can have 7 fractional-second digits.
-    date_part = text_value[:10]
-    try:
-        return datetime.strptime(date_part, "%Y-%m-%d").strftime("%d-%m-%Y")
-    except (ValueError, TypeError):
-        pass
-    for fmt in ("%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d"):
-        try:
-            return datetime.strptime(text_value.split(" ")[0], fmt).strftime("%d-%m-%Y")
-        except (ValueError, TypeError):
-            continue
-    return text_value.split(" ")[0]
-
-
-def _load_optional_subjects(cur, class_name, section):
-    """SubjectSetup से केवल selected Class/Section के Optional Subject लाएँ."""
-    columns = _table_columns(cur, "SubjectSetup")
-    if not columns:
-        return [], "SubjectSetup table नहीं मिली।"
-
-    class_col = _pick_col(columns, ["Class", "ClassName"])
-    section_col = _pick_col(columns, ["Section", "SectionName"])
-    subject_col = _pick_col(columns, ["Subject", "SubjectName"])
-    optional_col = _pick_col(columns, ["IsOptional", "OptionalSubject"])
-
-    if not all([class_col, section_col, subject_col, optional_col]):
-        return [], "SubjectSetup में Class, Section, Subject और IsOptional/OptionalSubject कॉलम आवश्यक हैं।"
-
-    cur.execute(f"""
-        SELECT DISTINCT LTRIM(RTRIM(CONVERT(NVARCHAR(255), [{subject_col}]))) AS SubjectName
-        FROM dbo.SubjectSetup
-        WHERE UPPER(LTRIM(RTRIM(CONVERT(NVARCHAR(255), ISNULL([{class_col}], '')))))
-                  = UPPER(LTRIM(RTRIM(?)))
-          AND UPPER(LTRIM(RTRIM(CONVERT(NVARCHAR(255), ISNULL([{section_col}], '')))))
-                  = UPPER(LTRIM(RTRIM(?)))
-          AND LOWER(LTRIM(RTRIM(CONVERT(NVARCHAR(20), ISNULL([{optional_col}], 0)))))
-                  IN ('1', 'true', 'yes', 'y', 'optional')
-          AND LTRIM(RTRIM(CONVERT(NVARCHAR(255), ISNULL([{subject_col}], '')))) <> ''
-        ORDER BY SubjectName
-    """, (class_name, section))
-    subjects = [str(row[0]).strip() for row in cur.fetchall() if row[0] is not None and str(row[0]).strip()]
-    return subjects, None
-
-
-def _optional_slots_for_class(class_name):
-    """Intermediate classes can assign three distinct optional subjects per student."""
-    import re
-    value = re.sub(r"[^a-z0-9]+", "", _clean_value(class_name).casefold())
-    intermediate_values = {
-        "11", "11th", "xi", "eleven", "eleventh", "classeleven", "class11",
-        "12", "12th", "xii", "twelve", "twelfth", "classtwelve", "class12",
-        "inter", "intermediate", "classxi", "classxii",
-    }
-    return 3 if value in intermediate_values else 1
-
-
-def _load_optional_assignments(cur, session_id, class_name, section):
-    """Return {student_id: [subject, ...]} so multiple subjects are supported."""
-    cur.execute("""
-        SELECT StudentID, SubjectName
-        FROM dbo.StudentOptionalSubject
-        WHERE SessionID = ? AND ClassName = ? AND SectionName = ?
-        ORDER BY StudentID, ID
-    """, (str(session_id), class_name, section))
-    assignments = {}
-    for row in cur.fetchall():
-        student_id = _clean_value(row[0])
-        subject = _clean_value(row[1])
-        if student_id and subject:
-            assignments.setdefault(student_id, [])
-            if subject.casefold() not in {s.casefold() for s in assignments[student_id]}:
-                assignments[student_id].append(subject)
-    return assignments
-
-
-@app.route("/my-students", methods=["GET", "POST"])
-def my_students():
-    ct = require_class_teacher()
-    if not ct:
-        return redirect(url_for("teacher_dashboard"))
-
-    conn = cur = None
-    error = None
-    success = None
-    students = []
-    optional_subjects = []
-    assigned_subjects = {}
-    sid = sname = ""
-    class_name = _clean_value(ct.get("class_name"))
-    section = _clean_value(ct.get("section"))
-    optional_slots = _optional_slots_for_class(class_name)
-
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-        students, sid, sname = _class_students(cur, ct)
-
-        # Optional subject assignment is stored in its own table so that
-        # StudentMaster/StudentAcademic and existing student details remain untouched.
-        cur.execute(OPTIONAL_ASSIGNMENT_TABLE_SQL)
-        conn.commit()
-
-        optional_subjects, optional_error = _load_optional_subjects(cur, class_name, section)
-        if optional_error:
-            error = optional_error
-
-        # Load current assignments before POST validation. This lets us keep an
-        # older assignment unchanged even if that subject is no longer flagged
-        # optional in SubjectSetup; it will not block assigning other students.
-        if sid:
-            assigned_subjects = _load_optional_assignments(cur, sid, class_name, section)
-
-        if request.method == "POST" and request.form.get("action") == "assign_all":
-            if not sid:
-                error = "Active Session is not set. Optional subjects were not saved."
-            elif optional_error:
-                error = optional_error
-            else:
-                allowed_ids = [str(st.get("id", "")).strip() for st in students]
-                allowed_by_key = {subject.casefold(): subject for subject in optional_subjects}
-                submitted_by_student = {}
-                duplicate_students = []
-                invalid_students = []
-
-                # Every Intermediate student gets three selectors; other classes get one.
-                # Subjects must be distinct within one student's selection, but the same
-                # subject remains assignable to other students in the same class.
-                for student_id in allowed_ids:
-                    if not student_id:
-                        continue
-                    raw_values = [
-                        request.form.get(f"optional_subject_{student_id}_{slot}", "").strip()
-                        for slot in range(1, optional_slots + 1)
-                    ]
-                    chosen_values = []
-                    seen_values = set()
-                    duplicated = False
-                    for value in raw_values:
-                        if not value:
-                            continue
-                        key = value.casefold()
-                        if key in seen_values:
-                            duplicated = True
-                            break
-                        seen_values.add(key)
-                        old_values = assigned_subjects.get(student_id, [])
-                        old_keys = {old.casefold() for old in old_values}
-                        if key not in allowed_by_key and key not in old_keys:
-                            invalid_students.append(student_id)
-                            continue
-                        chosen_values.append(allowed_by_key.get(key, value))
-                    if duplicated:
-                        duplicate_students.append(student_id)
-                    submitted_by_student[student_id] = chosen_values
-
-                if duplicate_students:
-                    error = "A student cannot be assigned the same Optional Subject more than once. Please choose distinct subjects in that student's selectors."
-                elif invalid_students:
-                    error = "One or more selected subjects are not configured as Optional for this Class/Section. No changes were saved."
-                else:
-                    user_name = _clean_value(
-                        session.get("user_email") or session.get("user_name") or session.get("employee_id")
-                    )
-                    inserted = 0
-                    removed = 0
-                    changed_students = 0
-                    try:
-                        for student_id, new_values in submitted_by_student.items():
-                            old_values = assigned_subjects.get(student_id, [])
-                            old_map = {value.casefold(): value for value in old_values}
-                            new_map = {value.casefold(): value for value in new_values}
-                            if set(old_map) == set(new_map):
-                                continue
-                            changed_students += 1
-
-                            # Remove only assignments cleared by the user.
-                            for old_key, old_subject in old_map.items():
-                                if old_key not in new_map:
-                                    cur.execute("""
-                                        DELETE FROM dbo.StudentOptionalSubject
-                                        WHERE SessionID = ? AND StudentID = ?
-                                          AND UPPER(LTRIM(RTRIM(ClassName))) = UPPER(LTRIM(RTRIM(?)))
-                                          AND UPPER(LTRIM(RTRIM(SectionName))) = UPPER(LTRIM(RTRIM(?)))
-                                          AND UPPER(LTRIM(RTRIM(SubjectName))) = UPPER(LTRIM(RTRIM(?)))
-                                    """, (str(sid), student_id, class_name, section, old_subject))
-                                    removed += max(cur.rowcount, 0)
-
-                            # Insert only new subjects; unchanged assignments keep their audit fields.
-                            for new_key, subject in new_map.items():
-                                if new_key in old_map:
-                                    continue
-                                cur.execute("""
-                                    INSERT INTO dbo.StudentOptionalSubject
-                                        (SessionID, SessionName, StudentID, ClassName, SectionName,
-                                         SubjectName, AssignedBy, AssignedAt)
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, SYSDATETIME())
-                                """, (str(sid), sname, student_id, class_name, section, subject, user_name))
-                                inserted += 1
-                        conn.commit()
-                        if changed_students:
-                            return redirect(url_for(
-                                "my_students", saved="1", students=str(changed_students),
-                                inserted=str(inserted), removed=str(removed)
-                            ))
-                        success = "No changes were required. Existing Optional Subject assignments are unchanged."
-                        assigned_subjects = _load_optional_assignments(cur, sid, class_name, section)
-                    except Exception:
-                        conn.rollback()
-                        raise
-
-        if request.method == "GET" and request.args.get("saved") == "1":
-            student_count = request.args.get("students", "0")
-            inserted_count = request.args.get("inserted", "0")
-            removed_count = request.args.get("removed", "0")
-            success = (
-                f"Optional Subject assignments saved. Students changed: {student_count}; "
-                f"subjects added: {inserted_count}; subjects removed: {removed_count}."
-            )
-
-        if sid and not assigned_subjects:
-            assigned_subjects = _load_optional_assignments(cur, sid, class_name, section)
-        for student in students:
-            student["dob_display"] = _format_dob(student.get("dob"))
-
-    except Exception as e:
-        if conn:
-            try:
-                conn.rollback()
-            except Exception:
-                pass
-        error = "My Students / Optional Subject load-save में समस्या: " + str(e)
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
-
-    return render_template(
-        "my_students.html",
-        teacher_name=session.get("user_name"),
-        school_name=get_school_name(),
-        class_name=class_name,
-        section=section,
-        session_name=sname,
-        students=students,
-        optional_subjects=optional_subjects,
-        assigned_subjects=assigned_subjects,
-        optional_slots=optional_slots,
-        error=error,
-        success=success
-    )
-
-
-@app.route("/my-student/<student_id>")
-def my_student_detail(student_id):
-    ct = require_class_teacher()
-    if not ct:
-        return redirect(url_for("teacher_dashboard"))
-
-    conn = cur = None
-    error = None
-    detail = []
-    allowed = None
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-        students, sid, sname = _class_students(cur, ct)
-        allowed = next((x for x in students if x["id"] == str(student_id).strip()), None)
-        if not allowed:
-            error = "यह विद्यार्थी आपकी assigned Class + Section में नहीं है।"
-        else:
-            cols = _table_columns(cur, "StudentMaster")
-            sm = _student_columns(cur)
-            # Show every StudentMaster column, exactly as stored.
-            cur.execute(f"""
-                SELECT *
-                FROM dbo.StudentMaster
-                WHERE [{sm['id']}] = ?
-            """, student_id)
-            row = cur.fetchone()
-            if row:
-                for i, col in enumerate(cols):
-                    detail.append((col, _clean_value(row[i])))
-    except Exception as e:
-        error = "Student details load में समस्या: " + str(e)
-    finally:
-        if cur: cur.close()
-        if conn: conn.close()
-
-    return render_template(
-        "my_student_detail.html",
-        teacher_name=session.get("user_name"),
-        school_name=get_school_name(),
-        student=allowed if not error else None,
-        details=detail,
-        error=error
-    )
-
+  document.querySelectorAll('[data-optional-picker-group]').forEach(group => {
+    const selects = Array.from(group.querySelectorAll('select[data-optional-subject-select]'));
+    selects.forEach(select => select.addEventListener('change', () => syncOptionalPickers(group)));
+    syncOptionalPickers(group);
+  });
+})();
+</script>
+</body>
+</html>
