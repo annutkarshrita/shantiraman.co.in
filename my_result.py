@@ -5,6 +5,9 @@ import re
 from app import app, get_connection, get_school_name
 from class_teacher_common import require_class_teacher, _clean_value
 
+# Performance revision: fetch ExamMarks only for the active class-teacher roster.
+MY_RESULT_PERFORMANCE_REVISION = "2026-10-15-roster-filter-v1"
+
 
 def _get_active_session(cur):
     """उसी DB connection से Active Session निकालें; अतिरिक्त connection न खोलें."""
@@ -57,15 +60,26 @@ def _get_active_session(cur):
 
 
 def _student_list(cur, ct, session_id, selected_student=""):
-    """Return only the active students of the logged-in Class Teacher."""
+    """Return the class teacher's active-session roster, excluding inactive master students."""
+    # StudentMaster status column names differ between installations. Detect the
+    # available column instead of assuming one fixed schema.
+    cur.execute("""
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'StudentMaster'
+    """)
+    master_columns = [str(r[0]).strip() for r in cur.fetchall()]
+    master_lookup = {c.casefold(): c for c in master_columns}
+    master_status_col = next((master_lookup[name] for name in (
+        "status", "isactive", "active", "studentstatus", "student_status",
+        "is_active", "recordstatus", "record_status"
+    ) if name in master_lookup), None)
+
     sql = """
         SELECT
             SA.SRNo,
             SM.ID,
-            SM.Student,
-            SM.Father,
-            SM.Mother,
-            SM.DOB
+            SM.Student
         FROM dbo.StudentAcademic SA
         INNER JOIN dbo.StudentMaster SM
             ON SM.ID = SA.StudentID
@@ -83,6 +97,11 @@ def _student_list(cur, ct, session_id, selected_student=""):
         ct["class_name"].strip(),
         ct["section"].strip(),
     ]
+    if master_status_col:
+        sql += f"""
+          AND LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), SM.[{master_status_col}]))))
+              IN ('active','1','true','yes','y')
+        """
     if selected_student:
         sql += " AND SM.ID = ?"
         params.append(selected_student)
@@ -95,9 +114,6 @@ def _student_list(cur, ct, session_id, selected_student=""):
             "srno": _clean_value(r[0]),
             "id": _clean_value(r[1]),
             "name": _clean_value(r[2]),
-            "father": _clean_value(r[3]),
-            "mother": _clean_value(r[4]),
-            "dob": _clean_value(r[5]),
         })
     return rows
 
@@ -110,9 +126,10 @@ def _available_exams(cur, class_name, section):
             SELECT DISTINCT
                 LTRIM(RTRIM(ISNULL(ExamType,''))) AS ExamType
             FROM dbo.SubjectSetup
-            WHERE LTRIM(RTRIM(ISNULL(Class,''))) = ?
-              AND LTRIM(RTRIM(ISNULL(Section,''))) = ?
-              AND LTRIM(RTRIM(ISNULL(ExamType,''))) <> ''
+            WHERE Class = ?
+              AND Section = ?
+              AND ExamType IS NOT NULL
+              AND LTRIM(RTRIM(ExamType)) <> ''
         ) AS available
         LEFT JOIN dbo.MasterTable AS mt
           ON LTRIM(RTRIM(ISNULL(mt.Category,''))) = 'Exam Type'
@@ -186,9 +203,9 @@ def _subjects_for_exam(cur, class_name, section, exam):
             {optional_expr} AS IsOptional,
             {extra_expr} AS IsExtraSubject
         FROM dbo.SubjectSetup
-        WHERE LTRIM(RTRIM(ISNULL([{class_col}],''))) = ?
-          AND LTRIM(RTRIM(ISNULL([{section_col}],''))) = ?
-          AND LTRIM(RTRIM(ISNULL([{exam_col}],''))) = ?
+        WHERE [{class_col}] = ?
+          AND [{section_col}] = ?
+          AND [{exam_col}] = ?
           AND {subject_expr} <> ''
         ORDER BY SubjectName, SubSubject
     """, (class_name, section, exam))
@@ -483,48 +500,57 @@ def my_result():
             # ExamMarks is the same table used by Exam / Marks.
             # SQL में ही प्रत्येक विद्यार्थी/विषय का नवीनतम रिकॉर्ड चुनें।
             # इससे पुराने duplicate records Python में लाने की जरूरत नहीं रहती।
-            marks_sql = """
-                WITH RankedMarks AS (
-                    SELECT
-                        StudentID,
-                        SubjectName,
-                        SubSubject,
-                        MaxMarks,
-                        ObtMarks,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY
-                                LTRIM(RTRIM(CONVERT(NVARCHAR(100), StudentID))),
-                                UPPER(LTRIM(RTRIM(ISNULL(SubjectName,'')))),
-                                UPPER(LTRIM(RTRIM(ISNULL(SubSubject,''))))
-                            ORDER BY
-                                TRY_CONVERT(DATETIME, EntryDate) DESC,
-                                EntryDate DESC,
-                                ID DESC
-                        ) AS rn
-                    FROM dbo.ExamMarks
-                    WHERE UPPER(LTRIM(RTRIM(ISNULL(SessionName,'')))) = UPPER(LTRIM(RTRIM(?)))
-                      AND UPPER(LTRIM(RTRIM(ISNULL(ExamType,'')))) = UPPER(LTRIM(RTRIM(?)))
-                      AND UPPER(LTRIM(RTRIM(ISNULL(ClassName,'')))) = UPPER(LTRIM(RTRIM(?)))
-                      AND UPPER(LTRIM(RTRIM(ISNULL(SectionName,'')))) = UPPER(LTRIM(RTRIM(?)))
-            """
-            marks_params = [
-                session_name,
-                selected_exam,
-                ct["class_name"].strip(),
-                ct["section"].strip(),
-            ]
-            if selected_student:
-                marks_sql += " AND StudentID = ?"
-                marks_params.append(selected_student)
-            marks_sql += """
-                )
-                SELECT StudentID, SubjectName, SubSubject, MaxMarks, ObtMarks
-                FROM RankedMarks
-                WHERE rn = 1
-            """
-            cur.execute(marks_sql, marks_params)
-
-            mark_rows = cur.fetchall()
+            # Only retrieve marks for students currently present in this teacher's
+            # active roster. The previous query ranked every matching ExamMarks row
+            # in the class, including old/inactive students. Direct equality on the
+            # four filter columns also allows SQL Server to use a matching index.
+            roster_ids = [str(s.get("id", "")).strip() for s in students if str(s.get("id", "")).strip()]
+            mark_rows = []
+            if roster_ids:
+                marks_sql = """
+                    WITH RankedMarks AS (
+                        SELECT
+                            StudentID,
+                            SubjectName,
+                            SubSubject,
+                            MaxMarks,
+                            ObtMarks,
+                            ROW_NUMBER() OVER (
+                                PARTITION BY
+                                    LTRIM(RTRIM(CONVERT(NVARCHAR(100), StudentID))),
+                                    UPPER(LTRIM(RTRIM(ISNULL(SubjectName,'')))),
+                                    UPPER(LTRIM(RTRIM(ISNULL(SubSubject,''))))
+                                ORDER BY
+                                    TRY_CONVERT(DATETIME, EntryDate) DESC,
+                                    EntryDate DESC,
+                                    ID DESC
+                            ) AS rn
+                        FROM dbo.ExamMarks
+                        WHERE SessionName = ?
+                          AND ExamType = ?
+                          AND ClassName = ?
+                          AND SectionName = ?
+                """
+                marks_params = [
+                    session_name,
+                    selected_exam,
+                    ct["class_name"].strip(),
+                    ct["section"].strip(),
+                ]
+                # SQL Server allows at most 2,100 parameters per statement. Keep the
+                # roster filter under that limit; real class rosters are far smaller.
+                # For unusually large rosters, the four indexed filters still apply.
+                if len(roster_ids) <= 2000:
+                    marks_sql += " AND StudentID IN (" + ",".join("?" for _ in roster_ids) + ")"
+                    marks_params.extend(roster_ids)
+                marks_sql += """
+                    )
+                    SELECT StudentID, SubjectName, SubSubject, MaxMarks, ObtMarks
+                    FROM RankedMarks
+                    WHERE rn = 1
+                """
+                cur.execute(marks_sql, marks_params)
+                mark_rows = cur.fetchall()
             print(f"[MY_RESULT_TIMING] exam_marks={(time.perf_counter()-_diag_t)*1000:.1f} ms; count={len(mark_rows)}")
             _diag_t = time.perf_counter()
             mark_map = {}
