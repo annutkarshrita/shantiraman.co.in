@@ -72,6 +72,7 @@ select option:disabled{color:#94a3b8}
         <table>
           <thead>
             <tr>
+              <th>SL No.</th>
               <th>Sr No</th>
               <th>Student Name</th>
               <th>Father's Name</th>
@@ -84,6 +85,7 @@ select option:disabled{color:#94a3b8}
           {% for x in students %}
             {% set current_subjects = assigned_subjects.get(x.id, []) %}
             <tr>
+              <td>{{ loop.index }}</td>
               <td>{{ x.srno or '-' }}</td>
               <td><b>{{ x.name or '-' }}</b></td>
               <td>{{ x.father or '-' }}</td>
