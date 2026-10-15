@@ -22,11 +22,35 @@ BEGIN
         SubjectName NVARCHAR(255) NOT NULL,
         AssignedBy NVARCHAR(255) NULL,
         AssignedAt DATETIME2(0) NOT NULL
-            CONSTRAINT DF_StudentOptionalSubject_AssignedAt DEFAULT (SYSDATETIME()),
-        CONSTRAINT UQ_StudentOptionalSubject_Session_Student
-            UNIQUE (SessionID, StudentID)
+            CONSTRAINT DF_StudentOptionalSubject_AssignedAt DEFAULT (SYSDATETIME())
     );
-END
+END;
+
+-- Earlier design allowed only one optional subject per student.
+-- Remove that restriction so Classes XI/XII can keep up to three subjects.
+IF EXISTS
+(
+    SELECT 1
+    FROM sys.key_constraints
+    WHERE parent_object_id = OBJECT_ID(N'dbo.StudentOptionalSubject')
+      AND name = N'UQ_StudentOptionalSubject_Session_Student'
+      AND type = 'UQ'
+)
+BEGIN
+    ALTER TABLE dbo.StudentOptionalSubject
+    DROP CONSTRAINT UQ_StudentOptionalSubject_Session_Student;
+END;
+
+IF NOT EXISTS
+(
+    SELECT 1 FROM sys.indexes
+    WHERE object_id = OBJECT_ID(N'dbo.StudentOptionalSubject')
+      AND name = N'IX_StudentOptionalSubject_Session_Student'
+)
+BEGIN
+    CREATE INDEX IX_StudentOptionalSubject_Session_Student
+    ON dbo.StudentOptionalSubject (SessionID, StudentID);
+END;
 """
 
 
@@ -90,18 +114,34 @@ def _load_optional_subjects(cur, class_name, section):
     return subjects, None
 
 
+def _optional_slots_for_class(class_name):
+    """Intermediate classes can assign three distinct optional subjects per student."""
+    import re
+    value = re.sub(r"[^a-z0-9]+", "", _clean_value(class_name).casefold())
+    intermediate_values = {
+        "11", "11th", "xi", "eleven", "eleventh", "classeleven", "class11",
+        "12", "12th", "xii", "twelve", "twelfth", "classtwelve", "class12",
+        "inter", "intermediate", "classxi", "classxii",
+    }
+    return 3 if value in intermediate_values else 1
+
+
 def _load_optional_assignments(cur, session_id, class_name, section):
+    """Return {student_id: [subject, ...]} so multiple subjects are supported."""
     cur.execute("""
         SELECT StudentID, SubjectName
         FROM dbo.StudentOptionalSubject
         WHERE SessionID = ? AND ClassName = ? AND SectionName = ?
+        ORDER BY StudentID, ID
     """, (str(session_id), class_name, section))
     assignments = {}
     for row in cur.fetchall():
         student_id = _clean_value(row[0])
         subject = _clean_value(row[1])
-        if student_id:
-            assignments[student_id] = subject
+        if student_id and subject:
+            assignments.setdefault(student_id, [])
+            if subject.casefold() not in {s.casefold() for s in assignments[student_id]}:
+                assignments[student_id].append(subject)
     return assignments
 
 
@@ -120,6 +160,7 @@ def my_students():
     sid = sname = ""
     class_name = _clean_value(ct.get("class_name"))
     section = _clean_value(ct.get("section"))
+    optional_slots = _optional_slots_for_class(class_name)
 
     try:
         conn = get_connection()
@@ -143,64 +184,83 @@ def my_students():
 
         if request.method == "POST" and request.form.get("action") == "assign_all":
             if not sid:
-                error = "Active Session नहीं मिली। Optional Subject सेव नहीं हुआ।"
+                error = "Active Session is not set. Optional subjects were not saved."
             elif optional_error:
                 error = optional_error
             else:
                 allowed_ids = [str(st.get("id", "")).strip() for st in students]
-                chosen = []
-                invalid_ids = []
-                allowed_subjects = set(optional_subjects)
-                submitted_any = False
+                allowed_by_key = {subject.casefold(): subject for subject in optional_subjects}
+                submitted_by_student = {}
+                duplicate_students = []
+                invalid_students = []
 
-                # Empty rows are intentionally skipped; an old assignment is not deleted.
-                # Unchanged pre-existing values are also skipped, preventing a legacy
-                # assignment from blocking updates to other students.
+                # Every Intermediate student gets three selectors; other classes get one.
+                # Subjects must be distinct within one student's selection, but the same
+                # subject remains assignable to other students in the same class.
                 for student_id in allowed_ids:
                     if not student_id:
                         continue
-                    subject = request.form.get(f"optional_subject_{student_id}", "").strip()
-                    if not subject:
-                        continue
-                    submitted_any = True
-                    old_subject = assigned_subjects.get(student_id, "")
-                    if subject == old_subject:
-                        continue
-                    if subject not in allowed_subjects:
-                        invalid_ids.append(student_id)
-                    else:
-                        chosen.append((student_id, subject))
+                    raw_values = [
+                        request.form.get(f"optional_subject_{student_id}_{slot}", "").strip()
+                        for slot in range(1, optional_slots + 1)
+                    ]
+                    chosen_values = []
+                    seen_values = set()
+                    duplicated = False
+                    for value in raw_values:
+                        if not value:
+                            continue
+                        key = value.casefold()
+                        if key in seen_values:
+                            duplicated = True
+                            break
+                        seen_values.add(key)
+                        old_values = assigned_subjects.get(student_id, [])
+                        old_keys = {old.casefold() for old in old_values}
+                        if key not in allowed_by_key and key not in old_keys:
+                            invalid_students.append(student_id)
+                            continue
+                        chosen_values.append(allowed_by_key.get(key, value))
+                    if duplicated:
+                        duplicate_students.append(student_id)
+                    submitted_by_student[student_id] = chosen_values
 
-                if invalid_ids:
-                    error = "कुछ विद्यार्थियों के लिए चुना गया विषय इस Class/Section के Optional Subject में उपलब्ध नहीं है। कोई बदलाव सेव नहीं किया गया।"
-                elif not chosen:
-                    if submitted_any:
-                        success = "कोई नया बदलाव नहीं था। पहले से assigned Optional Subjects सुरक्षित हैं।"
-                    else:
-                        error = "किसी विद्यार्थी का Optional Subject नहीं चुना गया। कोई बदलाव सेव नहीं किया गया।"
+                if duplicate_students:
+                    error = "A student cannot be assigned the same Optional Subject more than once. Please choose distinct subjects in that student's selectors."
+                elif invalid_students:
+                    error = "One or more selected subjects are not configured as Optional for this Class/Section. No changes were saved."
                 else:
                     user_name = _clean_value(
                         session.get("user_email") or session.get("user_name") or session.get("employee_id")
                     )
                     inserted = 0
-                    updated = 0
+                    removed = 0
+                    changed_students = 0
                     try:
-                        for student_id, subject in chosen:
-                            cur.execute("""
-                                SELECT ID
-                                FROM dbo.StudentOptionalSubject
-                                WHERE SessionID = ? AND StudentID = ?
-                            """, (str(sid), student_id))
-                            existing = cur.fetchone()
-                            if existing:
-                                cur.execute("""
-                                    UPDATE dbo.StudentOptionalSubject
-                                    SET SessionName = ?, ClassName = ?, SectionName = ?,
-                                        SubjectName = ?, AssignedBy = ?, AssignedAt = SYSDATETIME()
-                                    WHERE ID = ?
-                                """, (sname, class_name, section, subject, user_name, existing[0]))
-                                updated += 1
-                            else:
+                        for student_id, new_values in submitted_by_student.items():
+                            old_values = assigned_subjects.get(student_id, [])
+                            old_map = {value.casefold(): value for value in old_values}
+                            new_map = {value.casefold(): value for value in new_values}
+                            if set(old_map) == set(new_map):
+                                continue
+                            changed_students += 1
+
+                            # Remove only assignments cleared by the user.
+                            for old_key, old_subject in old_map.items():
+                                if old_key not in new_map:
+                                    cur.execute("""
+                                        DELETE FROM dbo.StudentOptionalSubject
+                                        WHERE SessionID = ? AND StudentID = ?
+                                          AND UPPER(LTRIM(RTRIM(ClassName))) = UPPER(LTRIM(RTRIM(?)))
+                                          AND UPPER(LTRIM(RTRIM(SectionName))) = UPPER(LTRIM(RTRIM(?)))
+                                          AND UPPER(LTRIM(RTRIM(SubjectName))) = UPPER(LTRIM(RTRIM(?)))
+                                    """, (str(sid), student_id, class_name, section, old_subject))
+                                    removed += max(cur.rowcount, 0)
+
+                            # Insert only new subjects; unchanged assignments keep their audit fields.
+                            for new_key, subject in new_map.items():
+                                if new_key in old_map:
+                                    continue
                                 cur.execute("""
                                     INSERT INTO dbo.StudentOptionalSubject
                                         (SessionID, SessionName, StudentID, ClassName, SectionName,
@@ -209,21 +269,24 @@ def my_students():
                                 """, (str(sid), sname, student_id, class_name, section, subject, user_name))
                                 inserted += 1
                         conn.commit()
-                        return redirect(url_for(
-                            "my_students", saved="1", assigned=str(len(chosen)),
-                            inserted=str(inserted), updated=str(updated)
-                        ))
+                        if changed_students:
+                            return redirect(url_for(
+                                "my_students", saved="1", students=str(changed_students),
+                                inserted=str(inserted), removed=str(removed)
+                            ))
+                        success = "No changes were required. Existing Optional Subject assignments are unchanged."
+                        assigned_subjects = _load_optional_assignments(cur, sid, class_name, section)
                     except Exception:
                         conn.rollback()
                         raise
 
         if request.method == "GET" and request.args.get("saved") == "1":
-            assigned_count = request.args.get("assigned", "0")
+            student_count = request.args.get("students", "0")
             inserted_count = request.args.get("inserted", "0")
-            updated_count = request.args.get("updated", "0")
+            removed_count = request.args.get("removed", "0")
             success = (
-                f"{assigned_count} विद्यार्थियों के Optional Subject सेव/अपडेट हो गए "
-                f"(नए: {inserted_count}, अपडेट: {updated_count})।"
+                f"Optional Subject assignments saved. Students changed: {student_count}; "
+                f"subjects added: {inserted_count}; subjects removed: {removed_count}."
             )
 
         if sid and not assigned_subjects:
@@ -254,6 +317,7 @@ def my_students():
         students=students,
         optional_subjects=optional_subjects,
         assigned_subjects=assigned_subjects,
+        optional_slots=optional_slots,
         error=error,
         success=success
     )
