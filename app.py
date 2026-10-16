@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 
 import pyodbc
 from flask import Flask, render_template, render_template_string, request, redirect, url_for, session
+import traceback
 app = Flask(__name__)
 sys.modules["app"] = sys.modules[__name__]
 app.secret_key = os.environ.get("SHANTIRAMAN_SECRET_KEY", "")
@@ -18,6 +19,8 @@ app.secret_key = os.environ.get("SHANTIRAMAN_SECRET_KEY", "")
 # ============================================================
 # DATABASE
 # ============================================================
+
+# PRINCIPAL_LOGIN_FIX_V1
 def get_connection():
     return pyodbc.connect(
         "DRIVER={ODBC Driver 17 for SQL Server};"
@@ -125,6 +128,8 @@ def normalize_role(role):
     value = str(role or "").strip().lower().replace(" ", "")
     if value in ("classteacher", "class_teacher"):
         return "classteacher"
+    if value in ("principal", "principle"):
+        return "principal"
     if value == "teacher":
         return "teacher"
     if value in ("admin", "administrator", "superadmin"):
@@ -134,6 +139,24 @@ def normalize_role(role):
 # ============================================================
 # MOBILE USER
 # ============================================================
+
+def _record_principal_login_error(context, exc):
+    """Record Principal-only authentication/runtime errors without affecting other roles."""
+    import traceback as _traceback
+    import os as _os
+    details = (
+        "\n" + "=" * 72 + "\n"
+        + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " | " + str(context) + "\n"
+        + _traceback.format_exc() + "\n"
+    )
+    print(details, flush=True)
+    try:
+        log_path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'mobileerp_error.log')
+        with open(log_path, 'a', encoding='utf-8') as log_file:
+            log_file.write(details)
+    except Exception:
+        pass
+
 def get_mobile_login_user(email):
     conn = cur = None
     try:
@@ -165,6 +188,150 @@ def get_mobile_login_user(email):
         if cur: cur.close()
         if conn: conn.close()
 
+def get_employee_master_principal(email):
+    """Find the one Principal in EmployeeMaster using available column names."""
+    conn = cur = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA='dbo' AND TABLE_NAME='EmployeeMaster'
+        """)
+        cols = {str(row[0]).strip().casefold(): str(row[0]).strip() for row in cur.fetchall()}
+
+        def pick(*names):
+            for name in names:
+                hit = cols.get(name.casefold())
+                if hit:
+                    return hit
+            return None
+
+        def qi(name):
+            return '[' + name.replace(']', ']]') + ']'
+
+        id_col = pick('ID', 'EmployeeID', 'EmpID')
+        name_col = pick('Name', 'EmployeeName', 'StaffName')
+        email_col = pick('EmailID', 'Email', 'EmailAddress')
+        designation_col = pick('Designation', 'DesignationName', 'Post')
+        mobile_col = pick('Moble', 'Mobile', 'MobileNo', 'MobileNumber', 'Phone', 'ContactNo', 'ContactNumber')
+
+        if not all([id_col, name_col, email_col, designation_col]):
+            missing = [label for label, col in (
+                ('ID', id_col), ('Name', name_col), ('Email', email_col),
+                ('Designation', designation_col)
+            ) if not col]
+            return None, 'EmployeeMaster is missing required column(s): ' + ', '.join(missing)
+
+        mobile_expr = f"CONVERT(NVARCHAR(100), {qi(mobile_col)})" if mobile_col else "CAST('' AS NVARCHAR(100))"
+        sql = f"""
+            SELECT CONVERT(NVARCHAR(100), {qi(id_col)}),
+                   CONVERT(NVARCHAR(255), {qi(name_col)}),
+                   CONVERT(NVARCHAR(255), {qi(email_col)}),
+                   {mobile_expr},
+                   CONVERT(NVARCHAR(100), {qi(designation_col)})
+            FROM dbo.EmployeeMaster
+            WHERE UPPER(LTRIM(RTRIM(ISNULL(CONVERT(NVARCHAR(100), {qi(designation_col)}), '')))) = N'PRINCIPAL'
+            ORDER BY {qi(id_col)}
+        """
+        cur.execute(sql)
+        rows = cur.fetchall()
+        if not rows:
+            return None, 'No EmployeeMaster record with Designation Principal was found.'
+        if len(rows) != 1:
+            return None, 'More than one Principal designation exists in EmployeeMaster. Keep only one Principal.'
+
+        row = rows[0]
+        principal = {
+            'employee_id': str(row[0] or '').strip(),
+            'name': str(row[1] or '').strip(),
+            'email': str(row[2] or '').strip(),
+            'mobile': str(row[3] or '').strip(),
+            'designation': str(row[4] or 'Principal').strip() or 'Principal',
+        }
+        if not principal['email']:
+            return None, 'The Principal email address is blank in EmployeeMaster.'
+        if principal['email'].casefold() != str(email or '').strip().casefold():
+            return None, 'The entered email does not match the Principal email in EmployeeMaster.'
+        return principal, None
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+def get_mobile_login_user_by_employee_id(employee_id):
+    """Find an existing mobile account by EmployeeID, even if its email is old."""
+    conn = cur = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT M.ID, M.EmployeeID, M.EmailID, M.PasswordHash,
+                   M.Designation, M.Role, M.IsActive, M.PasswordChanged,
+                   E.Name
+            FROM dbo.MobileLoginUser M
+            INNER JOIN dbo.EmployeeMaster E ON E.ID = M.EmployeeID
+            WHERE LTRIM(RTRIM(CONVERT(NVARCHAR(100), M.EmployeeID))) =
+                  LTRIM(RTRIM(CONVERT(NVARCHAR(100), ?)))
+        """, str(employee_id).strip())
+        row = cur.fetchone()
+        if not row:
+            return None
+        return {
+            "id": row[0], "employee_id": row[1],
+            "email": str(row[2] or "").strip(), "password_hash": row[3],
+            "designation": str(row[4] or "").strip(), "role": str(row[5] or "").strip(),
+            "is_active": bool(row[6]), "password_changed": bool(row[7]),
+            "name": str(row[8] or "").strip(),
+        }
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+def create_principal_mobile_login(principal):
+    """Create first Principal login with EmployeeMaster mobile as temporary password."""
+    first_password = "".join(ch for ch in str(principal.get("mobile", "")) if ch.isdigit())
+    if not first_password or not principal.get("email"):
+        return None
+    conn = cur = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        # MobileLoginUser.ID is a required string ID in this ERP schema.
+        # The existing Mobile Teacher Assign form creates it with token_hex(8).
+        cur.execute("""
+            INSERT INTO dbo.MobileLoginUser
+            (
+                ID, EmployeeID, EmailID, PasswordHash,
+                Designation, Role, IsActive, PasswordChanged,
+                LastLoginDate, EntryDate, UpdateDate
+            )
+            VALUES (?, ?, ?, ?, ?, 'Principal', 1, 0, NULL, GETDATE(), GETDATE())
+        """, secrets.token_hex(8), principal["employee_id"], principal["email"],
+             hash_mobile_password(first_password), principal.get("designation", "Principal"))
+        conn.commit()
+        return get_mobile_login_user(principal["email"])
+    except Exception as exc:
+        if conn:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+        print("PRINCIPAL MOBILE LOGIN CREATE ERROR:", repr(exc))
+        return None
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
 def update_last_login(employee_id):
     conn = cur = None
     try:
@@ -192,7 +359,7 @@ SMTP_EMAIL = "shanteeraman@gmail.com"
 # Google App Password à¤®à¥‡à¤‚ spaces à¤¹à¤Ÿà¤¾à¤•à¤° 16 characters à¤¡à¤¾à¤²à¥‡à¤‚à¥¤
 # à¤‡à¤¸à¥‡ à¤•à¤¿à¤¸à¥€ à¤•à¥‡ à¤¸à¤¾à¤¥ share à¤¨ à¤•à¤°à¥‡à¤‚à¥¤
 # ============================================================
-SMTP_APP_PASSWORD = os.environ.get("ctkudrfepqievmge", "")
+SMTP_APP_PASSWORD = os.environ.get("SHANTIRAMAN_SMTP_APP_PASSWORD", "")
 
 OTP_VALID_MINUTES = 5
 FORGOT_OTP = {}
@@ -325,9 +492,19 @@ def home():
             error = "à¤•à¥ƒà¤ªà¤¯à¤¾ Email ID à¤¡à¤¾à¤²à¥‡à¤‚à¥¤"
         elif not password:
             error = "à¤•à¥ƒà¤ªà¤¯à¤¾ Password à¤¡à¤¾à¤²à¥‡à¤‚à¥¤"
+        elif normalize_role(role) == "admin":
+            # Mobile ERP does not provide Admin login; administration stays in desktop ERP.
+            error = "Mobile ERP में Admin Login बंद है। कृपया Teacher, Class Teacher या Principal चुनें।"
         else:
             selected_role = normalize_role(role)
-            user = get_mobile_login_user(email)
+            try:
+                user = get_mobile_login_user(email)
+            except Exception as principal_user_lookup_exc:
+                if selected_role != "principal":
+                    raise
+                _record_principal_login_error("Principal MobileLoginUser email lookup failed", principal_user_lookup_exc)
+                user = None
+                error = "Principal login could not be completed. Check mobileerp_error.log."
 
             # ========================================================
             # CLASS TEACHER LOGIN
@@ -335,7 +512,95 @@ def home():
             # First login password = EmployeeMaster Mobile No.
             # MobileLoginUser is created automatically on first login.
             # ========================================================
-            if selected_role == "classteacher":
+            if selected_role == "principal":
+                if error:
+                    principal, principal_error = None, error
+                else:
+                    try:
+                        principal, principal_error = get_employee_master_principal(email)
+                    except Exception as principal_record_exc:
+                        _record_principal_login_error("Principal EmployeeMaster lookup failed", principal_record_exc)
+                        principal, principal_error = None, "Principal login could not be completed. Check mobileerp_error.log."
+                if not principal:
+                    error = principal_error
+                else:
+                    # An email already attached to a different employee must never be accepted.
+                    if user and str(user.get("employee_id")) != str(principal["employee_id"]):
+                        error = "यह Email ID किसी दूसरे Employee के Mobile Login से जुड़ी है। Admin से जाँच कराएँ।"
+
+                    # Existing accounts may still have the old email stored in MobileLoginUser.
+                    if not error and not user:
+                        try:
+                            user = get_mobile_login_user_by_employee_id(principal["employee_id"])
+                        except Exception as principal_user_id_exc:
+                            _record_principal_login_error("Principal MobileLoginUser employee lookup failed", principal_user_id_exc)
+                            error = "Principal login could not be completed. Check mobileerp_error.log."
+
+                    if not error and user and str(user.get("employee_id")) != str(principal["employee_id"]):
+                        error = "Mobile Login का EmployeeID Principal रिकॉर्ड से मेल नहीं खाता।"
+                    elif not error and user and not user["is_active"]:
+                        error = "आपका Mobile Login बंद है। Admin से संपर्क करें।"
+                    elif not error and user and not user["password_hash"]:
+                        error = "Principal के Mobile Login का Password Setup नहीं है। Admin से जाँच कराएँ।"
+                    elif not error and user and not verify_mobile_password(password, user["password_hash"]):
+                        error = "Password गलत है।"
+                    elif not error and not user:
+                        first_password = "".join(ch for ch in str(principal.get("mobile", "")) if ch.isdigit())
+                        if not first_password:
+                            error = "Employee Master में Principal का वैध Mobile No. उपलब्ध नहीं है।"
+                        elif password != first_password:
+                            error = "पहला Password Employee Master में दर्ज Principal का Mobile No. है।"
+                        else:
+                            user = create_principal_mobile_login(principal)
+                            if not user:
+                                user = get_mobile_login_user_by_employee_id(principal["employee_id"])
+                                if not user or not verify_mobile_password(password, user.get("password_hash")):
+                                    error = "Principal का Mobile Login नहीं बन पाया। Admin से जाँच कराएँ।"
+
+                    if user and not error:
+                        # Keep this Employee's mobile login credentials linked to the authoritative EmployeeMaster row.
+                        conn_sync = cur_sync = None
+                        try:
+                            conn_sync = get_connection()
+                            cur_sync = conn_sync.cursor()
+                            cur_sync.execute("""
+                                UPDATE dbo.MobileLoginUser
+                                SET EmailID=?, Designation=?, Role='Principal', UpdateDate=GETDATE()
+                                WHERE LTRIM(RTRIM(CONVERT(NVARCHAR(100), EmployeeID))) =
+                                      LTRIM(RTRIM(CONVERT(NVARCHAR(100), ?)))
+                            """, principal["email"], principal["designation"], principal["employee_id"])
+                            conn_sync.commit()
+                        except Exception as sync_error:
+                            if conn_sync:
+                                try:
+                                    conn_sync.rollback()
+                                except Exception:
+                                    pass
+                            print("PRINCIPAL MOBILE PROFILE SYNC ERROR:", repr(sync_error))
+                        finally:
+                            if cur_sync:
+                                cur_sync.close()
+                            if conn_sync:
+                                conn_sync.close()
+
+                        session["user_id"] = str(principal["employee_id"])
+                        session["employee_id"] = str(principal["employee_id"])
+                        session["user_name"] = principal["name"] or user.get("name") or "Principal"
+                        session["user_email"] = principal["email"]
+                        session["designation"] = principal["designation"] or "Principal"
+                        session["role"] = "Principal"
+
+                        if not user["password_changed"]:
+                            return redirect(url_for("change_password"))
+
+                        # Last-login timestamp is audit metadata; it must not block a valid Principal login.
+                        try:
+                            update_last_login(principal["employee_id"])
+                        except Exception as principal_last_login_exc:
+                            _record_principal_login_error("Principal LastLoginDate update failed", principal_last_login_exc)
+                        return redirect(url_for("principal_dashboard"))
+
+            elif selected_role == "classteacher":
                 ct = get_class_teacher_assignment_user(email)
 
                 if not ct:
@@ -486,7 +751,7 @@ def school_login():
 
 @app.route("/version")
 def app_version():
-    return "CLASS_TEACHER_LOGIN_FIXED_V4"
+    return "EMPLOYEE_MASTER_PRINCIPAL_LOGIN_V1"
 
 def get_class_teacher_assignment_user(email):
     """Return the active Class Teacher assignment for an EmployeeMaster email."""
@@ -759,6 +1024,8 @@ def reset_forgot_password():
 def teacher_dashboard():
     if "employee_id" not in session:
         return redirect(url_for("home"))
+    if normalize_role(session.get("role", "")) == "principal":
+        return redirect(url_for("principal_dashboard"))
 
     return render_template(
         "teacher_dashboard.html",
@@ -785,6 +1052,35 @@ import my_result
 import my_profile
 import my_fee
 import mark_entry  # Exam Marks Entry routes/helpers live in mark_entry.py
+import principal_dashboard  # Principal school-wide read-only reports/routes
+
+# Principal-only exception logging: teacher and class-teacher handling remains unchanged.
+@app.errorhandler(Exception)
+def _principal_only_error_handler(exc):
+    from werkzeug.exceptions import HTTPException
+    is_principal_login_post = (
+        request.method == 'POST'
+        and request.path in ('/', '/login', '/school-login')
+        and normalize_role(request.form.get('role', '')) == 'principal'
+    )
+    is_principal_session = normalize_role(session.get('role', '')) == 'principal'
+    if not (is_principal_login_post or is_principal_session):
+        if isinstance(exc, HTTPException):
+            return exc
+        raise exc
+
+    _record_principal_login_error(
+        'Unhandled Principal error at ' + str(request.method) + ' ' + str(request.path), exc
+    )
+    if is_principal_login_post:
+        return render_template(
+            'login.html',
+            error='Principal login could not be completed. Check mobileerp_error.log.',
+            reset_success=False,
+            school_name=session.get('school_name', 'Shantiraman Mobile ERP')
+        ), 500
+    return 'Principal request failed. Details have been saved to mobileerp_error.log.', 500
+
 
 if __name__ == "__main__":
     app.run(
