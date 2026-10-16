@@ -106,6 +106,7 @@ small{color:#64748b}
           <th>Percentage</th>
           <th>Entry Status</th>
           <th>Result</th>
+          <th>Print</th>
         </tr>
       </thead>
       <tbody>
@@ -130,6 +131,7 @@ small{color:#64748b}
             <td class="{% if r.result_status == 'PASS' %}pass{% elif r.result_status == 'FAIL' %}fail{% elif r.result_status in ('ABSENT','MEDICAL','A','M') %}special{% else %}pending{% endif %}">
               {{ r.result_status }}
             </td>
+            <td><a href="{{ url_for('my_result_print', student_id=students[loop.index0].id, exam=selected_exam) }}" target="_blank" style="display:inline-block;background:#166534;color:#fff;padding:7px 10px;border-radius:7px;text-decoration:none;font-weight:bold">Print Result</a></td>
           </tr>
           {% endfor %}
         {% else %}
