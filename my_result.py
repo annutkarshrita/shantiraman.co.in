@@ -594,6 +594,12 @@ def my_result():
                 ct["section"].strip(),
             )
 
+            # Display student names in A-Z order (case-insensitive).
+            students = sorted(
+                students,
+                key=lambda student: str(student.get("name", "") or "").strip().casefold(),
+            )
+
             for student in students:
                 cells = []
                 paper_marked = []
@@ -629,6 +635,23 @@ def my_result():
                         cells.append("—")
                     else:
                         cells.append(obtained)
+
+                # Show a student on My Result only after at least one numeric mark
+                # has been entered for the selected exam in any subject. Students
+                # with every subject blank (or only A/M status) stay hidden.
+                has_numeric_mark = False
+                for value in paper_obtained_values:
+                    value_text = str(value or "").strip()
+                    if not value_text or value_text.upper() in ("—", "-", "A", "M", "ABSENT", "MEDICAL"):
+                        continue
+                    try:
+                        float(value_text)
+                        has_numeric_mark = True
+                        break
+                    except (TypeError, ValueError):
+                        continue
+                if not has_numeric_mark:
+                    continue
 
                 assigned_optional = optional_assignment_map.get(
                     _norm_subject(student["id"]), set()
