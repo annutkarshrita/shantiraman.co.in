@@ -3,10 +3,10 @@ import time
 import re
 
 from app import app, get_connection, get_school_name
-from class_teacher_common import require_class_teacher, _clean_value
+from class_teacher_common import require_class_teacher, _clean_value, _class_students
 
 # Performance revision: fetch ExamMarks only for the active class-teacher roster.
-MY_RESULT_PERFORMANCE_REVISION = "2026-10-16-roster-subject-filter-v2"
+MY_RESULT_PERFORMANCE_REVISION = "2026-10-16-my-std-roster-session-v3"
 
 
 def _get_active_session(cur):
@@ -88,7 +88,8 @@ def _student_list(cur, ct, session_id, selected_student=""):
           AND SA.Section = ?
           AND (
               SA.SessStatus IS NULL OR
-              SA.SessStatus IN ('Active', 'active', 'ACTIVE', '1', 'true', 'True', 'TRUE', 'yes', 'Yes', 'YES')
+              LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), SA.SessStatus))))
+                  IN ('active','1','true','yes')
           )
     """
     params = [
@@ -462,16 +463,20 @@ def my_result():
     try:
         conn = get_connection()
         cur = conn.cursor()
-        print(f"[MY_RESULT_VERSION] {MY_RESULT_PERFORMANCE_REVISION}")
 
-        # Use app.py's verified dynamic SessionTable logic.
-        session_id, session_name = _get_active_session(cur)
-        print(f"[MY_RESULT_TIMING] active_session={(time.perf_counter()-_diag_start)*1000:.1f} ms")
+        # Use exactly the same session and roster helper as My Std.
+        # This prevents My Result from using a different active session/roster.
         _diag_t = time.perf_counter()
+        students, session_id, session_name = _class_students(cur, ct)
         if not session_id:
             raise RuntimeError("Active Session नहीं मिली।")
 
-        students = _student_list(cur, ct, session_id, selected_student)
+        if selected_student:
+            students = [
+                student for student in students
+                if str(student.get("id", "")).strip() == selected_student
+            ]
+
         print(f"[MY_RESULT_TIMING] students={(time.perf_counter()-_diag_t)*1000:.1f} ms; count={len(students)}")
         _diag_t = time.perf_counter()
 
