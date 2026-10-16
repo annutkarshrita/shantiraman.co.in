@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Progress Report</title>
+<style>
+@page{size:A4 portrait;margin:8mm}*{box-sizing:border-box}body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#111;margin:0;background:#fff}.sheet{width:100%;max-width:780px;margin:0 auto;border:1.5px solid #222;padding:9px}.head{display:grid;grid-template-columns:58px 1fr 58px;align-items:center;gap:8px;text-align:center;border-bottom:1.5px solid #222;padding:2px 0 7px}.logo{width:52px;height:52px;object-fit:contain;display:block;margin:auto}.school-title{font-weight:700;font-size:15px;line-height:1.2;margin:0}.school-address{font-size:10px;font-weight:600;margin-top:4px}.report-subtitle{font-size:9px;margin-top:5px}.title{text-align:center;font-weight:bold;font-size:13px;margin:7px 0}.details{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:14px;row-gap:0;font-size:10px;margin-bottom:8px}.details div{display:grid;grid-template-columns:88px 5px minmax(0,1fr);align-items:baseline;column-gap:1px;padding:2px 0;min-height:0;line-height:1.25;white-space:normal}.details div:nth-child(even){grid-template-columns:88px 5px minmax(0,1fr)}.details .detail-label{white-space:nowrap}.details .detail-colon{text-align:center}.details .detail-value{min-width:0;overflow-wrap:anywhere}.marks{width:100%;border-collapse:collapse;font-size:8.5px;table-layout:fixed}.marks th,.marks td{border:1px solid #333;padding:4px 2px;text-align:center;vertical-align:middle;overflow-wrap:anywhere}.marks th{background:#f0f0f0;font-weight:bold}.total-marks{margin-top:0}.total-marks th{font-size:8px;padding:4px 2px}.marks td.subject{text-align:left;width:25%}.marks th:first-child,.marks td:first-child{width:5%}.marks th:last-child,.marks td:last-child{width:7%}.total{display:flex;justify-content:space-between;gap:8px;font-weight:bold;font-size:10px;margin-top:7px;border:1px solid #333;padding:6px}.signs{display:flex;justify-content:space-between;gap:10px;margin-top:27px;font-size:9px;text-align:center}.signs div{width:32%;border-top:none;padding-top:4px}.actions{text-align:center;margin:10px}.actions button,.actions a{display:inline-block;padding:7px 14px;background:#28558c;color:white;border:0;border-radius:4px;text-decoration:none;cursor:pointer;font-size:13px;margin:0 4px}@media print{.details{font-size:9.5px;column-gap:14px}.details div,.details div:nth-child(even){grid-template-columns:84px 5px minmax(0,1fr)}.actions{display:none}.sheet{border:1.5px solid #222;max-width:none;padding:7px}.logo{width:48px;height:48px}.marks{font-size:8px}.marks th,.marks td{padding:3px 2px}}
+</style>
+</head>
+<body>
+<div class="actions"><button onclick="window.print()">Print / Save PDF</button><button type="button" onclick="history.back()">← Back to Result</button></div>
+<div class="sheet">
+  <div class="head">
+    <img class="logo" src="{{ school_logo_url or url_for('static', filename='school_logo.jpg') }}" alt="School Logo" onerror="this.style.visibility='hidden'">
+    <div>
+      <h2 class="school-title">{{ school_name or 'RAMRAJI SARASWATI BALIKA VIDYA MANDIR INTER COLLEGE' }}</h2>
+      <div class="school-address">{{ school_address or school_addr or 'Shahganj, Sultanpur (U.P.)' }}</div>
+      <div class="report-subtitle">Student Progress Report</div>
+    </div>
+    <img class="logo" src="{{ vidya_bharati_logo_url or url_for('static', filename='vidya_bharati_logo.png') }}" alt="Vidya Bharati Logo" onerror="this.style.visibility='hidden'">
+  </div>
+
+  {% set title_exam = selected_exam if selected_exam is defined and selected_exam else cumulative_exams[-1] %}
+  {% set title_upper = title_exam|string|upper %}
+  <div class="title">Mark Statement — {% if title_upper == 'HY' or 'HALF' in title_upper %}HALF YEARLY{% else %}{{ title_exam }}{% endif %}</div>
+
+  <div class="details">
+    <div><span class="detail-label">Scholar No.</span><span class="detail-colon">:</span><span class="detail-value">{{ student.srno or '—' }}</span></div><div><span class="detail-label">Class / Section</span><span class="detail-colon">:</span><span class="detail-value">{{ class_name or '—' }} / {{ section or '—' }}</span></div>
+    <div><span class="detail-label">Name (English)</span><span class="detail-colon">:</span><span class="detail-value">{{ student.name or '—' }}</span></div><div><span class="detail-label">Name (Hindi)</span><span class="detail-colon">:</span><span class="detail-value">{{ student.hindi_name or '—' }}</span></div>
+    <div><span class="detail-label">Father's Name</span><span class="detail-colon">:</span><span class="detail-value">{{ student.father or '—' }}</span></div><div><span class="detail-label">Father's Name</span><span class="detail-colon">:</span><span class="detail-value">{{ student.father_hindi or '—' }}</span></div>
+    <div><span class="detail-label">Mother's Name</span><span class="detail-colon">:</span><span class="detail-value">{{ student.mother or '—' }}</span></div><div><span class="detail-label">Mother's Name</span><span class="detail-colon">:</span><span class="detail-value">{{ student.mother_hindi or '—' }}</span></div>
+    {% set dob_text = student.dob|string if student.dob else '' %}
+    {% if dob_text|length >= 10 and dob_text[4:5] == '-' and dob_text[7:8] == '-' %}
+      {% set dob_text = dob_text[8:10] ~ '-' ~ dob_text[5:7] ~ '-' ~ dob_text[0:4] %}
+    {% endif %}
+    <div><span class="detail-label">D.O.B.</span><span class="detail-colon">:</span><span class="detail-value">{{ dob_text or '—' }}</span></div><div><span class="detail-label">Session</span><span class="detail-colon">:</span><span class="detail-value">{{ session_name or '—' }}</span></div>
+  </div>
+
+  {% set nscols = namespace(has_hy_practical=false) %}
+  {% for item in subjects %}
+    {% if (item.exam|string|upper == 'HY' or 'HALF' in (item.exam|string|upper)) and item.subsubject and 'THEORY' not in (item.subsubject|string|upper) %}
+      {% set nscols.has_hy_practical = true %}
+    {% endif %}
+  {% endfor %}
+  <table class="marks">
+    <colgroup>
+      <col style="width:5%"><col style="width:25%">
+      {% for exam in cumulative_exams %}
+        {% if exam|string|upper == 'HY' or 'HALF' in (exam|string|upper) %}
+          <col style="width:{{ '16%' if nscols.has_hy_practical else '20%' }}">
+          {% if nscols.has_hy_practical %}<col style="width:16%">{% endif %}
+        {% else %}
+          <col style="width:{{ '12%' if cumulative_exams|length <= 4 else '8%' }}">
+        {% endif %}
+      {% endfor %}
+      <col style="width:7%">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>S.L.</th><th>Subject</th>
+        {% for exam in cumulative_exams %}
+          {% set eu = exam|string|upper %}
+          {% if eu == 'HY' or 'HALF' in eu %}
+            <th colspan="{{ 2 if nscols.has_hy_practical else 1 }}">HALF YEARLY</th>
+          {% else %}
+            <th>{{ exam }}</th>
+          {% endif %}
+        {% endfor %}
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set order_ns = namespace(names=[]) %}
+      {% for s in subjects %}
+        {% if s.subject not in order_ns.names %}
+          {% set order_ns.names = order_ns.names + [s.subject] %}
+        {% endif %}
+      {% endfor %}
+      {% set ordered_ns = namespace(names=[]) %}
+      {% for master_name in (subject_order|default([])) %}
+        {% for actual_name in order_ns.names %}
+          {% if actual_name|string|lower == master_name|string|lower and actual_name not in ordered_ns.names %}
+            {% set ordered_ns.names = ordered_ns.names + [actual_name] %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      {% for actual_name in order_ns.names %}
+        {% if actual_name not in ordered_ns.names %}
+          {% set ordered_ns.names = ordered_ns.names + [actual_name] %}
+        {% endif %}
+      {% endfor %}
+      {% for subject_name in ordered_ns.names %}
+      {% set group_rows = subjects|selectattr('subject','equalto',subject_name)|list %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td class="subject">{{ subject_name }}</td>
+        {% set ns = namespace(subject_total=0) %}
+        {% for exam in cumulative_exams %}
+          {% set eu = exam|string|upper %}
+          {% set matches = group_rows|selectattr('exam','equalto',exam)|list %}
+          {% if eu == 'HY' or 'HALF' in eu %}
+            <td>
+              {% for s in matches if not s.subsubject or 'THEORY' in (s.subsubject|string|upper) %}
+                {{ s.obtained|default('',true)|float|int if s.obtained|string|trim not in ('', '—', '-') else '' }}{% if not loop.last %}, {% endif %}
+                {% set ns.subject_total = ns.subject_total + (s.obtained|default(0,true)|float) %}
+              {% endfor %}
+            </td>
+            {% if nscols.has_hy_practical %}
+            <td>
+              {% for s in matches if s.subsubject and 'THEORY' not in (s.subsubject|string|upper) %}
+                {{ s.obtained|default('',true)|float|int if s.obtained|string|trim not in ('', '—', '-') else '' }}{% if not loop.last %}, {% endif %}
+                {% set ns.subject_total = ns.subject_total + (s.obtained|default(0,true)|float) %}
+              {% endfor %}
+            </td>
+            {% endif %}
+          {% else %}
+            <td>
+              {% for s in matches %}
+                {{ s.obtained|default('',true)|float|int if s.obtained|string|trim not in ('', '—', '-') else '' }}{% if not loop.last %}, {% endif %}
+                {% set ns.subject_total = ns.subject_total + (s.obtained|default(0,true)|float) %}
+              {% endfor %}
+            </td>
+          {% endif %}
+        {% endfor %}
+        <td>{{ ns.subject_total|round(2)|int if ns.subject_total == ns.subject_total|int else "%.2f"|format(ns.subject_total|round(2)) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="total-row">
+        <th colspan="2" style="text-align:left">Total / Max Mark</th>
+        {% for exam in cumulative_exams %}
+          {% set eu = exam|string|upper %}
+          {% set et = namespace(found=none) %}
+          {% for item in exam_totals %}
+            {% if item.exam is defined and item.exam|string|lower == exam|string|lower %}
+              {% set et.found = item %}
+            {% endif %}
+          {% endfor %}
+          {% if et.found is not none %}
+            <th colspan="{{ 2 if (eu == 'HY' or 'HALF' in eu) and nscols.has_hy_practical else 1 }}">{{ et.found.obtained }}/{{ et.found.maximum }}</th>
+          {% else %}
+            <th colspan="{{ 2 if (eu == 'HY' or 'HALF' in eu) and nscols.has_hy_practical else 1 }}">—</th>
+          {% endif %}
+        {% endfor %}
+        <th>{{ total_obt }}/{{ total_max }}</th>
+      </tr>
+    </tfoot>
+  </table>
+  <div class="signs"><div>Class Teacher</div><div>Guardian's Sign.</div><div>Principal / Seal</div></div>
+</div>
+</body>
+</html>
