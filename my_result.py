@@ -6,7 +6,7 @@ from app import app, get_connection, get_school_name
 from class_teacher_common import require_class_teacher, _clean_value
 
 # Performance revision: fetch ExamMarks only for the active class-teacher roster.
-MY_RESULT_PERFORMANCE_REVISION = "2026-10-15-roster-filter-v1"
+MY_RESULT_PERFORMANCE_REVISION = "2026-10-16-roster-subject-filter-v2"
 
 
 def _get_active_session(cur):
@@ -537,17 +537,32 @@ def my_result():
                     ct["class_name"].strip(),
                     ct["section"].strip(),
                 ]
-                # SQL Server allows at most 2,100 parameters per statement. Keep the
-                # roster filter under that limit; real class rosters are far smaller.
-                # For unusually large rosters, the four indexed filters still apply.
-                if len(roster_ids) <= 2000:
+                # Restrict ranking to this teacher's active roster before SQL Server
+                # sorts ExamMarks. This avoids ranking marks for old/inactive students.
+                # Keep well below SQL Server's 2,100-parameter limit.
+                if len(roster_ids) <= 1900:
                     marks_sql += " AND StudentID IN (" + ",".join("?" for _ in roster_ids) + ")"
                     marks_params.extend(roster_ids)
+
+                # Only rank subjects configured for the selected exam. This is often
+                # the largest speed-up when ExamMarks contains many exams/subjects.
+                # Compare case-insensitively after trimming, matching the Python key
+                # normalization for ordinary subject names.
+                subject_names = sorted({
+                    str(subject.get("subject", "")).strip().upper()
+                    for subject in subjects
+                    if str(subject.get("subject", "")).strip()
+                })
+                if subject_names and len(marks_params) + len(subject_names) < 2000:
+                    marks_sql += " AND UPPER(LTRIM(RTRIM(ISNULL(SubjectName,'')))) IN (" + ",".join("?" for _ in subject_names) + ")"
+                    marks_params.extend(subject_names)
+
                 marks_sql += """
                     )
                     SELECT StudentID, SubjectName, SubSubject, MaxMarks, ObtMarks
                     FROM RankedMarks
                     WHERE rn = 1
+                    OPTION (RECOMPILE)
                 """
                 cur.execute(marks_sql, marks_params)
                 mark_rows = cur.fetchall()
@@ -560,7 +575,7 @@ def my_result():
                     _norm_subject(r[1]),
                     _norm_subject(r[2]),
                 )
-                # Latest record wins because query is ID DESC.
+                # Ranked SQL rows are returned newest-first per student/subject/paper.
                 if key not in mark_map:
                     mark_map[key] = {
                         "max_marks": _clean_value(r[3]),
