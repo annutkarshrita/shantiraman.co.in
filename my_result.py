@@ -88,8 +88,7 @@ def _student_list(cur, ct, session_id, selected_student=""):
           AND SA.Section = ?
           AND (
               SA.SessStatus IS NULL OR
-              LOWER(LTRIM(RTRIM(CONVERT(VARCHAR(100), SA.SessStatus))))
-                  IN ('active','1','true','yes')
+              SA.SessStatus IN ('Active', 'active', 'ACTIVE', '1', 'true', 'True', 'TRUE', 'yes', 'Yes', 'YES')
           )
     """
     params = [
@@ -463,6 +462,7 @@ def my_result():
     try:
         conn = get_connection()
         cur = conn.cursor()
+        print(f"[MY_RESULT_VERSION] {MY_RESULT_PERFORMANCE_REVISION}")
 
         # Use app.py's verified dynamic SessionTable logic.
         session_id, session_name = _get_active_session(cur)
