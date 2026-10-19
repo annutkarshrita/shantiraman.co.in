@@ -60,7 +60,7 @@ button:disabled{background:#aaa;cursor:not-allowed}
 <body>
 <div class="card">
 <h1>Shantiraman Mobile ERP</h1>
-<p>à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ School Select à¤•à¤°à¥‡à¤‚</p>
+<p>Please Selce Your School</p>
 <label for="school">School</label>
 <select id="school">
 <option value="">-- Select School --</option>
