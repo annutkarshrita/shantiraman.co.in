@@ -1,4 +1,3 @@
-
 import sys
 import os
 import ssl
@@ -40,11 +39,11 @@ SCHOOL_LIST = {
 
 SCHOOL_SELECT_HTML = """
 <!doctype html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>School Select - Shantiraman ERP</title>
+<title>School Select - Shantiraman Mobile App</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;display:flex;align-items:center;justify-content:center;min-height:100vh}
 .card{width:min(520px,92%);background:#fff;border-radius:16px;padding:30px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
@@ -355,9 +354,9 @@ SMTP_PORT = 465
 SMTP_EMAIL = "shanteeraman@gmail.com"
 
 # ============================================================
-# >>> à¤•à¥‡à¤µà¤² à¤‡à¤¸à¥€ à¤à¤• à¤œà¤—à¤¹ à¤…à¤ªà¤¨à¤¾ Gmail App Password à¤¡à¤¾à¤²à¥‡à¤‚ <<<
-# Google App Password à¤®à¥‡à¤‚ spaces à¤¹à¤Ÿà¤¾à¤•à¤° 16 characters à¤¡à¤¾à¤²à¥‡à¤‚à¥¤
-# à¤‡à¤¸à¥‡ à¤•à¤¿à¤¸à¥€ à¤•à¥‡ à¤¸à¤¾à¤¥ share à¤¨ à¤•à¤°à¥‡à¤‚à¥¤
+# >>> Enter your Gmail App Password only in this one place <<<
+# Remove spaces from the Google App Password and enter all 16 characters.
+# Do not share this password with anyone.
 # ============================================================
 SMTP_APP_PASSWORD = os.environ.get("SHANTIRAMAN_SMTP_APP_PASSWORD", "")
 
@@ -378,22 +377,22 @@ def send_mobile_otp(receiver_email, username, otp):
     print("========================================")
 
     if not SMTP_EMAIL:
-        raise RuntimeError("SMTP Email à¤–à¤¾à¤²à¥€ à¤¹à¥ˆà¥¤")
+        raise RuntimeError("SMTP email address is empty.")
 
     if not SMTP_APP_PASSWORD or SMTP_APP_PASSWORD == "PASTE_YOUR_GMAIL_APP_PASSWORD_HERE":
-        raise RuntimeError("app.py à¤®à¥‡à¤‚ Gmail App Password à¤¡à¤¾à¤²à¥‡à¤‚à¥¤")
+        raise RuntimeError("Enter the Gmail App Password in app.py.")
 
-    # App Password à¤®à¥‡à¤‚ accidental spaces à¤¹à¥‹à¤¨à¥‡ à¤ªà¤° à¤‰à¤¨à¥à¤¹à¥‡à¤‚ à¤¹à¤Ÿà¤¾à¤à¤à¥¤
+    # Remove any accidental spaces from the App Password.
     smtp_password = SMTP_APP_PASSWORD.replace(" ", "").strip()
 
     msg = EmailMessage()
-    msg["Subject"] = "Shantiraman ERP - Password Reset OTP"
+    msg["Subject"] = "Shantiraman Mobile App - Password Reset OTP"
     msg["From"] = SMTP_EMAIL
     msg["To"] = receiver_email
     msg.set_content(
         f"""Dear {username},
 
-Your Shantiraman ERP password reset OTP is:
+Your Shantiraman Mobile App password reset OTP is:
 
 {otp}
 
@@ -401,7 +400,7 @@ This OTP is valid for {OTP_VALID_MINUTES} minutes.
 Please do not share this OTP with anyone.
 
 Regards,
-Shantiraman ERP
+Shantiraman Mobile App
 """
     )
 
@@ -487,14 +486,14 @@ def home():
         password = request.form.get("password", "").strip()
 
         if not role:
-            error = "à¤•à¥ƒà¤ªà¤¯à¤¾ Role Select à¤•à¤°à¥‡à¤‚à¥¤"
+            error = "Please select a role."
         elif not email:
-            error = "à¤•à¥ƒà¤ªà¤¯à¤¾ Email ID à¤¡à¤¾à¤²à¥‡à¤‚à¥¤"
+            error = "Please enter your email address."
         elif not password:
-            error = "à¤•à¥ƒà¤ªà¤¯à¤¾ Password à¤¡à¤¾à¤²à¥‡à¤‚à¥¤"
+            error = "Please enter your password."
         elif normalize_role(role) == "admin":
             # Mobile ERP does not provide Admin login; administration stays in desktop ERP.
-            error = "Mobile ERP में Admin Login बंद है। कृपया Teacher, Class Teacher या Principal चुनें।"
+            error = "Admin login is disabled in Mobile ERP. Please select Teacher, Class Teacher, or Principal."
         else:
             selected_role = normalize_role(role)
             try:
@@ -526,7 +525,7 @@ def home():
                 else:
                     # An email already attached to a different employee must never be accepted.
                     if user and str(user.get("employee_id")) != str(principal["employee_id"]):
-                        error = "यह Email ID किसी दूसरे Employee के Mobile Login से जुड़ी है। Admin से जाँच कराएँ।"
+                        error = "This email address is linked to another employee mobile login. Please contact the administrator."
 
                     # Existing accounts may still have the old email stored in MobileLoginUser.
                     if not error and not user:
@@ -537,25 +536,25 @@ def home():
                             error = "Principal login could not be completed. Check mobileerp_error.log."
 
                     if not error and user and str(user.get("employee_id")) != str(principal["employee_id"]):
-                        error = "Mobile Login का EmployeeID Principal रिकॉर्ड से मेल नहीं खाता।"
+                        error = "The mobile login Employee ID does not match the Principal record."
                     elif not error and user and not user["is_active"]:
-                        error = "आपका Mobile Login बंद है। Admin से संपर्क करें।"
+                        error = "Your mobile login is disabled. Please contact the administrator."
                     elif not error and user and not user["password_hash"]:
-                        error = "Principal के Mobile Login का Password Setup नहीं है। Admin से जाँच कराएँ।"
+                        error = "A password has not been set for the Principal mobile login. Please contact the administrator."
                     elif not error and user and not verify_mobile_password(password, user["password_hash"]):
-                        error = "Password गलत है।"
+                        error = "Incorrect password."
                     elif not error and not user:
                         first_password = "".join(ch for ch in str(principal.get("mobile", "")) if ch.isdigit())
                         if not first_password:
-                            error = "Employee Master में Principal का वैध Mobile No. उपलब्ध नहीं है।"
+                            error = "A valid mobile number for the Principal is not available in Employee Master."
                         elif password != first_password:
-                            error = "पहला Password Employee Master में दर्ज Principal का Mobile No. है।"
+                            error = "The initial password is the Principal mobile number recorded in Employee Master."
                         else:
                             user = create_principal_mobile_login(principal)
                             if not user:
                                 user = get_mobile_login_user_by_employee_id(principal["employee_id"])
                                 if not user or not verify_mobile_password(password, user.get("password_hash")):
-                                    error = "Principal का Mobile Login नहीं बन पाया। Admin से जाँच कराएँ।"
+                                    error = "Could not create the Principal mobile login. Please contact the administrator."
 
                     if user and not error:
                         # Keep this Employee's mobile login credentials linked to the authoritative EmployeeMaster row.
@@ -604,7 +603,7 @@ def home():
                 ct = get_class_teacher_assignment_user(email)
 
                 if not ct:
-                    error = "यह Email ID किसी Active Class Teacher Assignment में उपलब्ध नहीं है।"
+                    error = "This email address is not associated with an active Class Teacher assignment."
 
                 elif not is_active_class_teacher(ct["employee_id"]):
                     error = "\u0907\u0938 Employee \u0915\u093e Active Class Teacher Assignment \u0928\u0939\u0940\u0902 \u092e\u093f\u0932\u093e\u0964"
@@ -612,18 +611,18 @@ def home():
                 else:
                     if user:
                         if not user["is_active"]:
-                            error = "à¤†à¤ªà¤•à¤¾ Mobile Login à¤¬à¤‚à¤¦ à¤¹à¥ˆà¥¤"
+                            error = "Your mobile login is disabled."
 
                         elif not user["password_hash"]:
                             error = (
-                                "à¤‡à¤¸ Class Teacher à¤•à¤¾ Mobile Login à¤¬à¤¨à¤¾ à¤¹à¥à¤† à¤¹à¥ˆ, "
-                                "à¤²à¥‡à¤•à¤¿à¤¨ Password Setup à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤"
+                                "A mobile login has been created for this Class Teacher, "
+                                "but a password has not been set."
                             )
 
                         elif not verify_mobile_password(
                             password, user["password_hash"]
                         ):
-                            error = "Password à¤—à¤²à¤¤ à¤¹à¥ˆà¥¤"
+                            error = "Incorrect password."
 
                         else:
                             # Keep the database Role synchronized with the
@@ -664,14 +663,14 @@ def home():
 
                         if not first_password:
                             error = (
-                                "à¤‡à¤¸ Class Teacher à¤•à¤¾ valid Mobile No. "
-                                "Employee Master à¤®à¥‡à¤‚ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤"
+                                "A valid mobile number for this Class Teacher "
+                                "is not available in Employee Master."
                             )
 
                         elif password != first_password:
                             error = (
-                                "Password à¤—à¤²à¤¤ à¤¹à¥ˆà¥¤ First Password à¤†à¤ªà¤•à¤¾ "
-                                "Mobile No. à¤¹à¥ˆà¥¤"
+                                "Incorrect password. Your initial password is your "
+                                "mobile number."
                             )
 
                         else:
@@ -679,8 +678,8 @@ def home():
 
                             if not user:
                                 error = (
-                                    "Class Teacher à¤•à¤¾ Mobile Login User "
-                                    "à¤¬à¤¨à¤¾à¤¯à¤¾ à¤¨à¤¹à¥€à¤‚ à¤œà¤¾ à¤¸à¤•à¤¾à¥¤"
+                                    "Class Teacher  mobile login user "
+                                    "could not be created."
                                 )
 
                     if user and not error:
@@ -702,15 +701,15 @@ def home():
             # ========================================================
             else:
                 if not user:
-                    error = "à¤¯à¤¹ Email ID Mobile User Setup à¤®à¥‡à¤‚ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤"
+                    error = "This email address is not available in Mobile User Setup."
                 elif not user["is_active"]:
-                    error = "à¤†à¤ªà¤•à¤¾ Mobile Login à¤¬à¤‚à¤¦ à¤¹à¥ˆà¥¤"
+                    error = "Your mobile login is disabled."
                 elif not user["password_hash"]:
-                    error = "à¤‡à¤¸ Mobile User à¤•à¤¾ Password Setup à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤"
+                    error = "A password has not been set for this mobile user."
                 elif selected_role != normalize_role(user["role"]):
-                    error = "à¤šà¤¯à¤¨à¤¿à¤¤ Role à¤‡à¤¸ Mobile User à¤•à¥‡ Role à¤¸à¥‡ à¤®à¥‡à¤² à¤¨à¤¹à¥€à¤‚ à¤–à¤¾à¤¤à¤¾à¥¤"
+                    error = "The selected role does not match this mobile user role."
                 elif not verify_mobile_password(password, user["password_hash"]):
-                    error = "Password à¤—à¤²à¤¤ à¤¹à¥ˆà¥¤"
+                    error = "Incorrect password."
                 else:
                     session["user_id"] = str(user["employee_id"])
                     session["employee_id"] = str(user["employee_id"])
@@ -878,11 +877,11 @@ def change_password():
         confirm = request.form.get("confirm_password", "").strip()
 
         if not new_password:
-            error = "à¤¨à¤¯à¤¾ Password à¤¡à¤¾à¤²à¥‡à¤‚à¥¤"
+            error = "Please enter a new password."
         elif len(new_password) < 6:
-            error = "Password à¤•à¤® à¤¸à¥‡ à¤•à¤® 6 characters à¤•à¤¾ à¤¹à¥‹à¤¨à¤¾ à¤šà¤¾à¤¹à¤¿à¤à¥¤"
+            error = "Password must contain at least 6 characters."
         elif new_password != confirm:
-            error = "à¤¦à¥‹à¤¨à¥‹à¤‚ Password à¤¸à¤®à¤¾à¤¨ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¤‚à¥¤"
+            error = "The passwords do not match."
         else:
             conn = cur = None
             try:
@@ -898,7 +897,7 @@ def change_password():
                 update_last_login(session["employee_id"])
                 return redirect(url_for("teacher_dashboard"))
             except Exception as e:
-                error = "Password update à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤ªà¤¾à¤¯à¤¾: " + str(e)
+                error = "Could not update password: " + str(e)
             finally:
                 if cur: cur.close()
                 if conn: conn.close()
@@ -917,13 +916,13 @@ def forgot_password():
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         if not email:
-            error = "Email ID à¤¡à¤¾à¤²à¥‡à¤‚à¥¤"
+            error = "Please enter your email address."
         else:
             user = get_mobile_login_user(email)
             if not user:
-                error = "à¤¯à¤¹ Email ID Mobile User Setup à¤®à¥‡à¤‚ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤"
+                error = "This email address is not available in Mobile User Setup."
             elif not user["is_active"]:
-                error = "à¤¯à¤¹ Mobile Login à¤¬à¤‚à¤¦ à¤¹à¥ˆà¥¤"
+                error = "This mobile login is disabled."
             else:
                 otp = f"{secrets.randbelow(1000000):06d}"
                 try:
@@ -937,7 +936,7 @@ def forgot_password():
                     session["forgot_email"] = user["email"]
                     return redirect(url_for("verify_forgot_otp"))
                 except Exception as e:
-                    error = "OTP à¤­à¥‡à¤œà¤¾ à¤¨à¤¹à¥€à¤‚ à¤œà¤¾ à¤¸à¤•à¤¾: " + str(e)
+                    error = "Could not send OTP: " + str(e)
 
     return render_template("forgot_password.html",
                            stage="email", error=error,
@@ -957,12 +956,12 @@ def verify_forgot_otp():
         data = FORGOT_OTP.get(email.lower())
 
         if not data:
-            error = "OTP à¤¨à¤¹à¥€à¤‚ à¤®à¤¿à¤²à¤¾à¥¤ à¤«à¤¿à¤° à¤¸à¥‡ Forgot Password à¤•à¤°à¥‡à¤‚à¥¤"
+            error = "OTP was not found. Please try Forgot Password again."
         elif datetime.now() - data["created"] > timedelta(minutes=OTP_VALID_MINUTES):
             FORGOT_OTP.pop(email.lower(), None)
-            error = "OTP expire à¤¹à¥‹ à¤—à¤¯à¤¾à¥¤ à¤¨à¤¯à¤¾ OTP à¤²à¥‡à¤‚à¥¤"
+            error = "OTP has expired. Please request a new OTP."
         elif not hmac.compare_digest(str(otp), str(data["otp"])):
-            error = "OTP à¤—à¤²à¤¤ à¤¹à¥ˆà¥¤"
+            error = "Incorrect OTP."
         else:
             session["forgot_verified"] = True
             return redirect(url_for("reset_forgot_password"))
@@ -986,9 +985,9 @@ def reset_forgot_password():
         confirm = request.form.get("confirm_password", "").strip()
 
         if len(new_password) < 6:
-            error = "Password à¤•à¤® à¤¸à¥‡ à¤•à¤® 6 characters à¤•à¤¾ à¤¹à¥‹à¤¨à¤¾ à¤šà¤¾à¤¹à¤¿à¤à¥¤"
+            error = "Password must contain at least 6 characters."
         elif new_password != confirm:
-            error = "à¤¦à¥‹à¤¨à¥‹à¤‚ Password à¤¸à¤®à¤¾à¤¨ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¤‚à¥¤"
+            error = "The passwords do not match."
         else:
             conn = cur = None
             try:
@@ -1008,7 +1007,7 @@ def reset_forgot_password():
                 session["password_reset_success"] = True
                 return redirect(url_for("home"))
             except Exception as e:
-                error = "Password reset à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤ªà¤¾à¤¯à¤¾: " + str(e)
+                error = "Could not reset password: " + str(e)
             finally:
                 if cur: cur.close()
                 if conn: conn.close()
