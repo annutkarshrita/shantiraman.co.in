@@ -1,3 +1,4 @@
+
 import sys
 import os
 import ssl
@@ -43,7 +44,7 @@ SCHOOL_SELECT_HTML = """
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>School Select - Shantiraman Mobile App</title>
+<title>School Select - Shantiraman Mobile Application</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;display:flex;align-items:center;justify-content:center;min-height:100vh}
 .card{width:min(520px,92%);background:#fff;border-radius:16px;padding:30px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
@@ -386,21 +387,21 @@ def send_mobile_otp(receiver_email, username, otp):
     smtp_password = SMTP_APP_PASSWORD.replace(" ", "").strip()
 
     msg = EmailMessage()
-    msg["Subject"] = "Shantiraman Mobile App - Password Reset OTP"
+    msg["Subject"] = "Shantiraman Mobile Application- Password Reset OTP"
     msg["From"] = SMTP_EMAIL
     msg["To"] = receiver_email
     msg.set_content(
         f"""Dear {username},
 
-Your Shantiraman Mobile App password reset OTP is:
+Your Shantiraman Mobile Application password reset OTP is:
 
 {otp}
 
-This OTP is valid for {OTP_VALID_MINUTES} minutes.
+This OTP is valid for {OTP_VALID_MINUTES} minutes.5
 Please do not share this OTP with anyone.
 
 Regards,
-Shantiraman Mobile App
+Shantiraman Mobile Application
 """
     )
 
@@ -1076,7 +1077,7 @@ def _principal_only_error_handler(exc):
             'login.html',
             error='Principal login could not be completed. Check mobileerp_error.log.',
             reset_success=False,
-            school_name=session.get('school_name', 'Shantiraman Mobile ERP')
+            school_name=session.get('school_name', 'Shantiraman Mobile Application')
         ), 500
     return 'Principal request failed. Details have been saved to mobileerp_error.log.', 500
 
