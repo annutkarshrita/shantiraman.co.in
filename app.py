@@ -59,8 +59,8 @@ button:disabled{background:#aaa;cursor:not-allowed}
 </head>
 <body>
 <div class="card">
-<h1>Shantiraman Mobile ERP</h1>
-<p>Please Selce Your School</p>
+<h1>Shantiraman Mobile Application</h1>
+<p>Please Select Your School</p>
 <label for="school">School</label>
 <select id="school">
 <option value="">-- Select School --</option>
